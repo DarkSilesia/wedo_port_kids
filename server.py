@@ -4,7 +4,7 @@ import webbrowser
 import os
 import socket
 
-PORT = 8000
+PORT = 8080
 
 # Metoda bezpiecznego wykrywania lokalnego adresu IP komputera w sieci Wi-Fi/LAN
 def get_local_ip():
@@ -40,11 +40,11 @@ socketserver.TCPServer.allow_reuse_address = True
 with socketserver.TCPServer(("0.0.0.0", PORT), Handler) as httpd:
     print(f"\n=======================================================")
     print(f"  SERWER URUCHOMIONY W SIECI LOKALNEJ!")
-    print(f"  💻 Na komputerze: http://localhost:{PORT}")
-    print(f"  📱 Na telefonie (Wi-Fi): http://{local_ip}:{PORT}")
+    print(f"  [PC] Na komputerze: http://localhost:{PORT}")
+    print(f"  [Mobile] Na telefonie (Wi-Fi): http://{local_ip}:{PORT}")
     print(f"=======================================================\n")
     
-    print("⚠️ WAŻNA WSKAZÓWKA DLA TELEFONU (Web Bluetooth przez HTTP):")
+    print("!!! WAŻNA WSKAZÓWKA DLA TELEFONU (Web Bluetooth przez HTTP) !!!")
     print("Przeglądarki na telefonie wymagają połączenia HTTPS, aby zezwolić na używanie Bluetooth.")
     print("Aby sterować klockiem za pomocą lokalnego serwera HTTP przez Wi-Fi:")
     print("1. Otwórz w przeglądarce Chrome na telefonie adres: chrome://flags")
