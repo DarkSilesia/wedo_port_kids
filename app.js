@@ -308,21 +308,69 @@ async function connectToWeDo() {
     }
     
     try {
-        if (statusText) statusText.innerText = "Skanowanie...";
+        if (statusText) statusText.innerText = "Łączenie...";
         btnBt.className = "btn-header bt-connecting";
         
-        state.device = await navigator.bluetooth.requestDevice({
-            filters: [
-                { namePrefix: 'LPF2 Smart Hub' },
-                { namePrefix: 'WeDo' }
-            ],
-            optionalServices: [WEDO_SERVICE_UUID, BATTERY_SERVICE_UUID]
-        });
+        let device = null;
         
+        // Spróbuj pobrać wcześniej sparowane urządzenia
+        if (navigator.bluetooth.getDevices) {
+            try {
+                const devices = await navigator.bluetooth.getDevices();
+                const wedoDevice = devices.find(d => 
+                    d.name && (d.name.includes('LPF2 Smart Hub') || d.name.includes('WeDo') || d.name.includes('Smart Hub'))
+                ) || devices[0];
+                
+                if (wedoDevice) {
+                    console.log("Znaleziono wcześniej sparowane urządzenie:", wedoDevice.name);
+                    device = wedoDevice;
+                }
+            } catch (e) {
+                console.warn("Błąd podczas pobierania zapamiętanych urządzeń:", e);
+            }
+        }
+        
+        // Jeśli nie ma zapamiętanego urządzenia, poproś użytkownika o parowanie
+        if (!device) {
+            if (statusText) statusText.innerText = "Skanowanie...";
+            device = await navigator.bluetooth.requestDevice({
+                filters: [
+                    { namePrefix: 'LPF2 Smart Hub' },
+                    { namePrefix: 'WeDo' }
+                ],
+                optionalServices: [WEDO_SERVICE_UUID, BATTERY_SERVICE_UUID]
+            });
+        }
+        
+        state.device = device;
         state.device.addEventListener('gattserverdisconnected', onDisconnected);
         
         if (statusText) statusText.innerText = "Łączenie...";
-        const server = await state.device.gatt.connect();
+        
+        // Spróbuj połączyć się z gatt (z obsługą błędu np. gdy klocek jest wyłączony)
+        let server;
+        try {
+            server = await state.device.gatt.connect();
+        } catch (connectError) {
+            console.warn("Nie udało się połączyć z zapamiętanym urządzeniem. Próbuję nowego parowania...", connectError);
+            
+            // Jeśli to było zapamiętane urządzenie, spróbuj poprosić o parowanie jako fallback
+            if (navigator.bluetooth.getDevices) {
+                if (statusText) statusText.innerText = "Skanowanie...";
+                device = await navigator.bluetooth.requestDevice({
+                    filters: [
+                        { namePrefix: 'LPF2 Smart Hub' },
+                        { namePrefix: 'WeDo' }
+                    ],
+                    optionalServices: [WEDO_SERVICE_UUID, BATTERY_SERVICE_UUID]
+                });
+                state.device = device;
+                state.device.addEventListener('gattserverdisconnected', onDisconnected);
+                server = await state.device.gatt.connect();
+            } else {
+                throw connectError;
+            }
+        }
         
         // Pobierz główny serwis kontroli
         const service = await server.getPrimaryService(WEDO_SERVICE_UUID);
