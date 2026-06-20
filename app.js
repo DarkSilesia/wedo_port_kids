@@ -271,42 +271,27 @@ function renderTimeline() {
         
         // W zależności od typu wygeneruj ikonę i opis parametru
         if (block.type === 'motor') {
-            const arrowDir = block.dir === 'right' ? '➡️' : '⬅️';
             const speedEmoji = block.speed === 'turtle' ? '🐢' : (block.speed === 'rabbit' ? '🐇' : '🐆');
             bgColor = block.dir === 'right' ? 'var(--color-motor-right)' : 'var(--color-motor-left)';
             
-            const arrowPath = block.dir === 'right' 
-                ? 'M12,2 A10,10 0 0,1 22,12' 
-                : 'M12,2 A10,10 0 0,0 2,12';
-            const headPath = block.dir === 'right' 
-                ? 'M22,9 L22,14 L17,13 Z' 
-                : 'M2,9 L2,14 L7,13 Z';
+            const arrowSvg = block.dir === 'right'
+                ? `<svg viewBox="0 0 24 24" width="36" height="36"><path d="M5,12 L19,12 M13,6 L19,12 L13,18" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`
+                : `<svg viewBox="0 0 24 24" width="36" height="36"><path d="M19,12 L5,12 M11,6 L5,12 L11,18" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
             
             innerHTML += `
                 <div class="block-icon">
-                    <svg viewBox="0 0 24 24" width="36" height="36">
-                        <circle cx="12" cy="12" r="3" fill="#ffffff"/>
-                        <circle cx="12" cy="12" r="6" fill="none" stroke="#ffffff" stroke-width="2"/>
-                        <line x1="12" y1="2" x2="12" y2="6" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="12" y1="18" x2="12" y2="22" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="2" y1="12" x2="6" y2="12" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="18" y1="12" x2="22" y2="12" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-                        <path d="${arrowPath}" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
-                        <path d="${headPath}" fill="#ffffff"/>
-                    </svg>
+                    ${arrowSvg}
                 </div>
-                <div class="block-param">${arrowDir} ${speedEmoji}</div>
+                <div class="block-param-icon">${speedEmoji}</div>
             `;
         } else if (block.type === 'motor-stop') {
             bgColor = 'var(--color-stop)';
             innerHTML += `
                 <div class="block-icon">
                     <svg viewBox="0 0 24 24" width="36" height="36">
-                        <polygon points="8,2 16,2 22,8 22,16 16,22 8,22 2,16 2,8" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
-                        <path d="M12,6 A2,2 0 0,1 14,8 L14,11 A1,1 0 0,1 15,12 A1,1 0 0,1 16,13 L16,15 A4,4 0 0,1 12,19 L12,19 A4,4 0 0,1 8,15 L8,10 A2,2 0 0,1 10,8 A2,2 0 0,1 12,6 Z" fill="#ffffff"/>
+                        <polygon points="8,2 16,2 22,8 22,16 16,22 8,22 2,16 2,8" fill="#ffffff"/>
                     </svg>
                 </div>
-                <div class="block-param">🛑</div>
             `;
         } else if (block.type === 'led') {
             bgColor = 'var(--color-led)';
@@ -314,20 +299,19 @@ function renderTimeline() {
             innerHTML += `
                 <div class="block-icon">
                     <svg viewBox="0 0 24 24" width="36" height="36">
-                        <path d="M12,2A7,7 0 0,0 5,9C5,12.63 7.39,15.7 10.76,16.5V19H13.24V16.5C16.61,15.7 19,12.63 19,9A7,7 0 0,0 12,2" fill="#ffffff"/>
+                        <path d="M12,2A7,7 0 0,0 5,9C5,12.63 7.39,15.7 10.76,16.5V19H13.24V16.5C16.61,15.7 19,12.63 19,9A7,7 0 0,0 12,2" fill="${colorHex}"/>
                     </svg>
                 </div>
-                <div class="block-param" style="border: 2px solid ${colorHex}; background: rgba(0,0,0,0.5);">💡</div>
             `;
         } else if (block.type === 'wait') {
             bgColor = 'var(--color-wait)';
             innerHTML += `
                 <div class="block-icon">
-                    <svg viewBox="0 0 24 24" width="36" height="36">
+                    <svg viewBox="0 0 24 24" width="34" height="34">
                         <path d="M6 2H18V8H18V8L14 12L18 16V16H18V22H6V16H6V16L10 12L6 8V8H6V2M8 4V7.5L12 11.5L16 7.5V4H8" fill="#ffffff"/>
                     </svg>
                 </div>
-                <div class="block-param">${block.duration}s</div>
+                <div class="block-param-icon" style="color: #ffffff; font-weight: bold; font-size: 13px;">${block.duration}</div>
             `;
         } else if (block.type === 'sound') {
             bgColor = 'var(--color-sound)';
@@ -339,21 +323,20 @@ function renderTimeline() {
             
             innerHTML += `
                 <div class="block-icon">
-                    <svg viewBox="0 0 24 24" width="36" height="36">
-                        <path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18,19.86 21,16.28 21,12" fill="#ffffff"/>
+                    <svg viewBox="0 0 24 24" width="34" height="34">
+                        <path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18,19.86 21,16.28 21,12 M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16 M3,9V15H7L12,20V4L7,9H3Z" fill="#ffffff"/>
                     </svg>
                 </div>
-                <div class="block-param">${emoji}</div>
+                <div class="block-param-icon">${emoji}</div>
             `;
         } else if (block.type === 'loop') {
             bgColor = 'var(--color-loop)';
             innerHTML += `
                 <div class="block-icon">
-                    <svg viewBox="0 0 24 24" width="36" height="36">
-                        <path d="M19,8l-4,4h3c0,3.31-2.69,6-6,6c-1.01,0-1.97-0.25-2.8-0.7l-1.46,1.46C8.97,19.54,10.43,20,12,20c4.42,0,8-3.58,8-8" fill="#ffffff"/>
+                    <svg viewBox="0 0 24 24" width="34" height="34">
+                        <path d="M19,8l-4,4h3c0,3.31-2.69,6-6,6c-1.01,0-1.97-0.25-2.8-0.7l-1.46,1.46C8.97,19.54,10.43,20,12,20c4.42,0,8-3.58,8-8h3L19,8z M6,12 c0-3.31,2.69-6,6-6c1.01,0,1.97,0.25,2.8,0.7l1.46-1.46C15.03,4.46,13.57,4,12,4c-4.42,0-8,3.58-8,8H1L5,16l4-4H6z" fill="#ffffff"/>
                     </svg>
                 </div>
-                <div class="block-param">🔄</div>
             `;
         }
         
@@ -412,10 +395,10 @@ function openBlockConfigModal(id) {
     const block = state.program.find(b => b.id === id);
     if (!block) return;
     
-    state.activeBlockIdToEdit = id;
-    
     // Zamknij wszystkie najpierw
     closeAllModals();
+    
+    state.activeBlockIdToEdit = id;
     
     if (block.type === 'motor') {
         const modal = document.getElementById('modal-motor');
