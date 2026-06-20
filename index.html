@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WeDo 2.0 Graficzny Kontroler</title>
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d0e1c">
     <meta name="mobile-web-app-capable" content="yes">
@@ -306,8 +306,9 @@
         <!-- Modal: Instrukcja dla rodzica -->
         <div id="modal-help" class="modal-overlay hidden">
             <div class="modal-card help-modal">
-                <div class="help-modal-header">
+                <div class="help-modal-header" style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
                     <h2>Instrukcja dla Rodzica 📚</h2>
+                    <span style="font-size: 11px; color: var(--text-secondary); opacity: 0.6; font-weight: bold; margin-bottom: 6px;">Wersja: v4</span>
                 </div>
                 <div class="help-modal-content">
                     <h3>💡 Jak połączyć klocki?</h3>
@@ -365,6 +366,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=4"></script>
 </body>
 </html>
