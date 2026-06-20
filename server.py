@@ -21,10 +21,14 @@ def get_local_ip():
 
 class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
-        # Wyłączenie keszowania plików w przeglądarce podczas prac programistycznych
-        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
-        self.send_header("Pragma", "no-cache")
-        self.send_header("Expires", "0")
+        # Wyłącz cache tylko dla kodu (HTML, JS, CSS), aby zmiany w kodzie wchodziły od razu
+        if self.path.endswith('.html') or self.path.endswith('.js') or self.path.endswith('.css') or self.path == '/':
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+            self.send_header("Pragma", "no-cache")
+            self.send_header("Expires", "0")
+        else:
+            # Pozwól przeglądarce zapamiętać pliki MP3 oraz grafiki PNG, aby ładowały się natychmiast
+            self.send_header("Cache-Control", "public, max-age=86400")
         super().end_headers()
 
 # Zmień katalog roboczy na ten, w którym znajduje się skrypt
@@ -33,11 +37,11 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 Handler = MyHTTPRequestHandler
 local_ip = get_local_ip()
 
-# Ustawiamy ponowne użycie portu, aby uniknąć błędów blokowania portu ("address already in use")
-socketserver.TCPServer.allow_reuse_address = True
+# Ustawiamy ponowne użycie portu i wielowątkowość
+socketserver.ThreadingTCPServer.allow_reuse_address = True
 
 # Powiązanie z "0.0.0.0" sprawia, że serwer jest widoczny dla całej sieci lokalnej (Wi-Fi)
-with socketserver.TCPServer(("0.0.0.0", PORT), Handler) as httpd:
+with socketserver.ThreadingTCPServer(("0.0.0.0", PORT), Handler) as httpd:
     print(f"\n=======================================================")
     print(f"  SERWER URUCHOMIONY W SIECI LOKALNEJ!")
     print(f"  [PC] Na komputerze: http://localhost:{PORT}")
