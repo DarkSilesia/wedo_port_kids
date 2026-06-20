@@ -30,6 +30,20 @@ const LED_COLORS = {
 
 // --- Dźwięki (Web Audio API) ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let noiseBuffer = null;
+
+// Pomocniczy bufor szumu do uzyskania naturalnych dźwięków (np. szczekanie psa)
+function getNoiseBuffer() {
+    if (!noiseBuffer) {
+        const bufferSize = audioCtx.sampleRate * 0.4; // 0.4 sekundy szumu
+        noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+    }
+    return noiseBuffer;
+}
 
 function playSynthesizedSound(type) {
     if (audioCtx.state === 'suspended') {
@@ -39,60 +53,125 @@ function playSynthesizedSound(type) {
     const now = audioCtx.currentTime;
     
     switch (type) {
-        case 'cat': { // meow
-            const osc = audioCtx.createOscillator();
+        case 'cat': { // meow (synteza formantowa "m-e-o-w")
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const filter = audioCtx.createBiquadFilter();
             const gain = audioCtx.createGain();
-            osc.connect(gain);
+            
+            osc1.type = 'triangle';
+            osc2.type = 'sawtooth'; // bogate harmoniczne do filtrowania
+            
+            const osc2Gain = audioCtx.createGain();
+            osc2Gain.gain.value = 0.15; // przyciszamy ostry sawtooth
+            
+            osc2.connect(osc2Gain);
+            osc1.connect(filter);
+            osc2Gain.connect(filter);
+            
+            filter.connect(gain);
             gain.connect(audioCtx.destination);
             
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(300, now);
-            osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
-            osc.frequency.exponentialRampToValueAtTime(600, now + 0.4);
+            // Zmiana tonu (wysokości dźwięku) meow
+            osc1.frequency.setValueAtTime(320, now);
+            osc1.frequency.exponentialRampToValueAtTime(480, now + 0.15);
+            osc1.frequency.exponentialRampToValueAtTime(300, now + 0.55);
             
+            osc2.frequency.setValueAtTime(322, now); // lekkie rozstrojenie dla głębi
+            osc2.frequency.exponentialRampToValueAtTime(482, now + 0.15);
+            osc2.frequency.exponentialRampToValueAtTime(302, now + 0.55);
+
+            // Filtr Bandpass symulujący gardło kota i samogłoski (vowel formant sweep)
+            filter.type = 'bandpass';
+            filter.Q.value = 3.0;
+            filter.frequency.setValueAtTime(500, now);
+            filter.frequency.exponentialRampToValueAtTime(1200, now + 0.18); // dźwięk "ee"
+            filter.frequency.exponentialRampToValueAtTime(450, now + 0.55); // przejście w "ow"
+            
+            // Obwiednia głośności
             gain.gain.setValueAtTime(0, now);
-            gain.gain.linearRampToValueAtTime(0.3, now + 0.05);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+            gain.gain.linearRampToValueAtTime(0.25, now + 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
             
-            osc.start(now);
-            osc.stop(now + 0.4);
+            osc1.start(now);
+            osc2.start(now);
+            osc1.stop(now + 0.6);
+            osc2.stop(now + 0.6);
             break;
         }
-        case 'dog': { // bark
+        case 'dog': { // bark/woof (szum + niski ton + szybki spadek)
             const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
+            const oscGain = audioCtx.createGain();
+            const noise = audioCtx.createBufferSource();
+            const noiseGain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+            const masterGain = audioCtx.createGain();
+            
+            noise.buffer = getNoiseBuffer();
             
             osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(120, now);
-            osc.frequency.exponentialRampToValueAtTime(250, now + 0.05);
-            osc.frequency.exponentialRampToValueAtTime(80, now + 0.2);
             
-            gain.gain.setValueAtTime(0, now);
-            gain.gain.linearRampToValueAtTime(0.4, now + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            noise.connect(noiseGain);
+            noiseGain.connect(filter);
             
+            osc.connect(oscGain);
+            oscGain.connect(filter);
+            
+            filter.connect(masterGain);
+            masterGain.connect(audioCtx.destination);
+            
+            // Filtracja nadająca szczeknięciu „pudełkowy” charakter
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(380, now);
+            filter.frequency.exponentialRampToValueAtTime(180, now + 0.14);
+            filter.Q.value = 2.5;
+            
+            // Obniżanie częstotliwości w trakcie szczeknięcia
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(70, now + 0.14);
+            
+            oscGain.gain.setValueAtTime(0.25, now);
+            noiseGain.gain.setValueAtTime(0.55, now); // głośny szum nadaje realizmu
+            
+            // Bardzo szybki atak i spadek głośności
+            masterGain.gain.setValueAtTime(0, now);
+            masterGain.gain.linearRampToValueAtTime(0.35, now + 0.01);
+            masterGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            
+            noise.start(now);
             osc.start(now);
-            osc.stop(now + 0.2);
+            noise.stop(now + 0.16);
+            osc.stop(now + 0.16);
             break;
         }
-        case 'bird': { // chirp
+        case 'bird': { // chirp (szybki podwójny ćwierk - "ćwir ćwir")
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
+            
+            osc.type = 'sine';
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(1500, now);
-            osc.frequency.exponentialRampToValueAtTime(3000, now + 0.08);
+            // Pierwszy ćwierk (szybki skok w górę i dół)
+            osc.frequency.setValueAtTime(1800, now);
+            osc.frequency.exponentialRampToValueAtTime(3200, now + 0.04);
+            osc.frequency.exponentialRampToValueAtTime(1400, now + 0.08);
             
             gain.gain.setValueAtTime(0, now);
-            gain.gain.linearRampToValueAtTime(0.2, now + 0.02);
+            gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
             
+            // Drugi ćwierk (nieco wyższy, startuje po 110ms)
+            osc.frequency.setValueAtTime(2000, now + 0.11);
+            osc.frequency.exponentialRampToValueAtTime(3600, now + 0.15);
+            osc.frequency.exponentialRampToValueAtTime(1600, now + 0.19);
+            
+            gain.gain.setValueAtTime(0, now + 0.11);
+            gain.gain.linearRampToValueAtTime(0.18, now + 0.13);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.19);
+            
             osc.start(now);
-            osc.stop(now + 0.08);
+            osc.stop(now + 0.21);
             break;
         }
         case 'robot': { // bleep bloop
