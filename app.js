@@ -233,21 +233,37 @@ function sendLedColorCommand(colorByte) {
 }
 
 // Komenda Silnika: [Port, Opcode=0x01, Mode=0x01, Speed]
-// Aby ułatwić dziecku sterowanie, wysyłamy komendę do obu fizycznych portów (1 i 2)
-function sendMotorCommand(speed) {
-    // Port 1
-    writeCommandBytes([0x01, 0x01, 0x01, speed]);
-    // Port 2
-    setTimeout(() => {
-        writeCommandBytes([0x02, 0x01, 0x01, speed]);
-    }, 20);
+// Obsługuje wybór pojedynczego portu (1 lub 2) lub obu (both) w celu skręcania
+function sendMotorCommand(speed, port = 'both') {
+    if (port === '1' || port === 'both') {
+        writeCommandBytes([0x01, 0x01, 0x01, speed]);
+    }
+    if (port === '2' || port === 'both') {
+        const delay = (port === 'both') ? 20 : 0;
+        if (delay > 0) {
+            setTimeout(() => {
+                writeCommandBytes([0x02, 0x01, 0x01, speed]);
+            }, delay);
+        } else {
+            writeCommandBytes([0x02, 0x01, 0x01, speed]);
+        }
+    }
 }
 
-function sendMotorStopCommand() {
-    writeCommandBytes([0x01, 0x01, 0x01, 0x00]);
-    setTimeout(() => {
-        writeCommandBytes([0x02, 0x01, 0x01, 0x00]);
-    }, 20);
+function sendMotorStopCommand(port = 'both') {
+    if (port === '1' || port === 'both') {
+        writeCommandBytes([0x01, 0x01, 0x01, 0x00]);
+    }
+    if (port === '2' || port === 'both') {
+        const delay = (port === 'both') ? 20 : 0;
+        if (delay > 0) {
+            setTimeout(() => {
+                writeCommandBytes([0x02, 0x01, 0x01, 0x00]);
+            }, delay);
+        } else {
+            writeCommandBytes([0x02, 0x01, 0x01, 0x00]);
+        }
+    }
 }
 
 // --- Zarządzanie Osią Czasu (Oś programu) ---
@@ -278,7 +294,14 @@ function renderTimeline() {
                 ? `<svg viewBox="0 0 24 24" width="36" height="36"><path d="M5,12 L19,12 M13,6 L19,12 L13,18" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`
                 : `<svg viewBox="0 0 24 24" width="36" height="36"><path d="M19,12 L5,12 M11,6 L5,12 L11,18" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
             
+            const portDots = block.port === '1'
+                ? '<div class="port-dot active-left"></div><div class="port-dot"></div>'
+                : (block.port === '2'
+                    ? '<div class="port-dot"></div><div class="port-dot active-right"></div>'
+                    : '<div class="port-dot active-left"></div><div class="port-dot active-right"></div>');
+
             innerHTML += `
+                <div class="port-dots-container">${portDots}</div>
                 <div class="block-icon">
                     ${arrowSvg}
                 </div>
@@ -286,7 +309,15 @@ function renderTimeline() {
             `;
         } else if (block.type === 'motor-stop') {
             bgColor = 'var(--color-stop)';
+            
+            const portDots = block.port === '1'
+                ? '<div class="port-dot active-left"></div><div class="port-dot"></div>'
+                : (block.port === '2'
+                    ? '<div class="port-dot"></div><div class="port-dot active-right"></div>'
+                    : '<div class="port-dot active-left"></div><div class="port-dot active-right"></div>');
+
             innerHTML += `
+                <div class="port-dots-container">${portDots}</div>
                 <div class="block-icon">
                     <svg viewBox="0 0 24 24" width="36" height="36">
                         <polygon points="8,2 16,2 22,8 22,16 16,22 8,22 2,16 2,8" fill="#ffffff"/>
@@ -359,6 +390,9 @@ function addBlock(type, defaults = {}) {
     if (type === 'motor') {
         newBlock.dir = defaults.dir || 'right';
         newBlock.speed = defaults.speed || 'rabbit';
+        newBlock.port = defaults.port || 'both';
+    } else if (type === 'motor-stop') {
+        newBlock.port = defaults.port || 'both';
     } else if (type === 'led') {
         newBlock.color = defaults.color || 'blue';
     } else if (type === 'wait') {
@@ -413,6 +447,19 @@ function openBlockConfigModal(id) {
         document.querySelectorAll('.speed-btn').forEach(btn => {
             btn.classList.toggle('selected', btn.dataset.speed === block.speed);
         });
+        
+        // Zaznacz aktualny port
+        document.querySelectorAll('.port-btn').forEach(btn => {
+            btn.classList.toggle('selected', btn.dataset.port === block.port);
+        });
+    } else if (block.type === 'motor-stop') {
+        const modal = document.getElementById('modal-motor-stop');
+        modal.classList.remove('hidden');
+        
+        // Zaznacz aktualny port stopu
+        document.querySelectorAll('.stop-port-btn').forEach(btn => {
+            btn.classList.toggle('selected', btn.dataset.port === block.port);
+        });
     } else if (block.type === 'led') {
         const modal = document.getElementById('modal-led');
         modal.classList.remove('hidden');
@@ -449,6 +496,7 @@ function closeAllModals() {
 function initModalListeners() {
     // Zamykanie modali przyciskiem OK
     document.getElementById('btn-close-motor').addEventListener('click', closeAllModals);
+    document.getElementById('btn-close-motor-stop').addEventListener('click', closeAllModals);
     document.getElementById('btn-close-led').addEventListener('click', closeAllModals);
     document.getElementById('btn-close-wait').addEventListener('click', closeAllModals);
     document.getElementById('btn-close-sound').addEventListener('click', closeAllModals);
@@ -473,6 +521,32 @@ function initModalListeners() {
             if (block) {
                 block.speed = btn.dataset.speed;
                 document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                renderTimeline();
+            }
+        });
+    });
+
+    // Modal Silnika - Port
+    document.querySelectorAll('.port-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const block = state.program.find(b => b.id === state.activeBlockIdToEdit);
+            if (block) {
+                block.port = btn.dataset.port;
+                document.querySelectorAll('.port-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                renderTimeline();
+            }
+        });
+    });
+
+    // Modal Stop Silnika - Port
+    document.querySelectorAll('.stop-port-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const block = state.program.find(b => b.id === state.activeBlockIdToEdit);
+            if (block) {
+                block.port = btn.dataset.port;
+                document.querySelectorAll('.stop-port-btn').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 renderTimeline();
             }
@@ -602,13 +676,13 @@ async function runNextStep() {
                 }
                 
                 if (state.isConnected) {
-                    sendMotorCommand(speedVal);
+                    sendMotorCommand(speedVal, block.port);
                 }
                 break;
             }
             case 'motor-stop': {
                 if (state.isConnected) {
-                    sendMotorStopCommand();
+                    sendMotorStopCommand(block.port);
                 }
                 break;
             }

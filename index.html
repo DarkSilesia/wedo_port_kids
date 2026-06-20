@@ -138,7 +138,7 @@
 
         <!-- Okienka konfiguracyjne (Czysto graficzne, bez tekstu, dopasowane do wysokości landscape) -->
         
-        <!-- Modal: Silnik (Kierunek i Prędkość) -->
+        <!-- Modal: Silnik (Kierunek, Port i Prędkość) -->
         <div id="modal-motor" class="modal-overlay hidden">
             <div class="modal-card wide-modal">
                 <div class="modal-content horizontal-layout">
@@ -153,6 +153,35 @@
                             <button id="motor-opt-dir-left" class="dir-btn" data-dir="left">
                                 <svg viewBox="0 0 24 24" width="48" height="48">
                                     <path d="M19,12 L5,12 M11,6 L5,12 L11,18" stroke="#f97316" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="divider-y"></div>
+
+                    <!-- Port Silnika (Lewy, Oba, Prawy) -->
+                    <div class="setting-group compact-group">
+                        <div class="port-options">
+                            <button class="port-btn" data-port="1" title="Lewy">
+                                <svg viewBox="0 0 24 24" width="36" height="36">
+                                    <rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
+                                    <circle cx="9" cy="8" r="2.5" fill="#22c55e"/>
+                                    <circle cx="15" cy="8" r="2.5" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+                                </svg>
+                            </button>
+                            <button class="port-btn" data-port="both" title="Oba">
+                                <svg viewBox="0 0 24 24" width="36" height="36">
+                                    <rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
+                                    <circle cx="9" cy="8" r="2.5" fill="#22c55e"/>
+                                    <circle cx="15" cy="8" r="2.5" fill="#22c55e"/>
+                                </svg>
+                            </button>
+                            <button class="port-btn" data-port="2" title="Prawy">
+                                <svg viewBox="0 0 24 24" width="36" height="36">
+                                    <rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
+                                    <circle cx="9" cy="8" r="2.5" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+                                    <circle cx="15" cy="8" r="2.5" fill="#22c55e"/>
                                 </svg>
                             </button>
                         </div>
@@ -176,6 +205,40 @@
                     </div>
                 </div>
                 <button id="btn-close-motor" class="btn-modal-ok">👍</button>
+            </div>
+        </div>
+
+        <!-- Modal: Stop Silnika (Wybór portu) -->
+        <div id="modal-motor-stop" class="modal-overlay hidden">
+            <div class="modal-card">
+                <div class="modal-content">
+                    <div class="setting-group">
+                        <div class="port-options">
+                            <button class="stop-port-btn" data-port="1" title="Lewy">
+                                <svg viewBox="0 0 24 24" width="36" height="36">
+                                    <rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
+                                    <circle cx="9" cy="8" r="2.5" fill="#ef4444"/>
+                                    <circle cx="15" cy="8" r="2.5" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+                                </svg>
+                            </button>
+                            <button class="stop-port-btn" data-port="both" title="Oba">
+                                <svg viewBox="0 0 24 24" width="36" height="36">
+                                    <rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
+                                    <circle cx="9" cy="8" r="2.5" fill="#ef4444"/>
+                                    <circle cx="15" cy="8" r="2.5" fill="#ef4444"/>
+                                </svg>
+                            </button>
+                            <button class="stop-port-btn" data-port="2" title="Prawy">
+                                <svg viewBox="0 0 24 24" width="36" height="36">
+                                    <rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
+                                    <circle cx="9" cy="8" r="2.5" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+                                    <circle cx="15" cy="8" r="2.5" fill="#ef4444"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <button id="btn-close-motor-stop" class="btn-modal-ok">👍</button>
             </div>
         </div>
 
