@@ -15,18 +15,29 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Panel górny: Status połączenia i bateria (Zminimalizowany dla telefonów) -->
+        <!-- Panel górny: Status połączenia, bateria i pomoc (Zminimalizowany dla telefonów) -->
         <header class="app-header">
             <button id="btn-bluetooth" class="btn-header bt-disconnected">
                 <svg class="icon-bt" viewBox="0 0 24 24" width="20" height="20">
                     <path d="M17.71,7.71L12,2h-1v7.59L6.41,4.59L5,6l6,6l-6,6l1.41,1.41L11,14.41V22h1l5.71-5.71L13.41,12L17.71,7.71z M13,5.83 l1.88,1.88L13,9.59V5.83z M13,18.17v-3.76l1.88,1.88L13,18.17z"/>
                 </svg>
             </button>
-            <div id="battery-indicator" class="battery-status hidden">
-                <svg viewBox="0 0 24 24" width="16" height="16">
-                    <path d="M16 20H8V6H16V20ZM15.5 4H13V2H11V4H8.5C7.67 4 7 4.67 7 5.5V20.5C7 21.33 7.67 22 8.5 22H15.5C16.33 22 17 21.33 17 20.5V5.5C17 4.67 16.33 4 15.5 4Z" fill="#22c55e"/>
-                </svg>
-                <span id="battery-level">100%</span>
+            
+            <div class="header-right">
+                <div id="battery-indicator" class="battery-status hidden">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path d="M16 20H8V6H16V20ZM15.5 4H13V2H11V4H8.5C7.67 4 7 4.67 7 5.5V20.5C7 21.33 7.67 22 8.5 22H15.5C16.33 22 17 21.33 17 20.5V5.5C17 4.67 16.33 4 15.5 4Z" fill="#22c55e"/>
+                    </svg>
+                    <span id="battery-level">100%</span>
+                </div>
+                
+                <button id="btn-help" class="btn-header bt-disconnected" style="border-radius: 50%;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#8e95be" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </button>
             </div>
         </header>
 
@@ -289,6 +300,47 @@
                     </div>
                 </div>
                 <button id="btn-close-sound" class="btn-modal-ok">👍</button>
+            </div>
+        </div>
+
+        <!-- Modal: Instrukcja dla rodzica -->
+        <div id="modal-help" class="modal-overlay hidden">
+            <div class="modal-card help-modal">
+                <div class="help-modal-header">
+                    <h2>Instrukcja dla Rodzica 📚</h2>
+                </div>
+                <div class="help-modal-content">
+                    <h3>💡 Jak połączyć klocki?</h3>
+                    <p>Włącz Bluetooth w telefonie, włącz SmartHub WeDo (zielony przycisk) i kliknij ikonę <b>Bluetooth</b> w lewym górnym rogu. Sparuj SmartHub.</p>
+                    <p><b>Wskazówka:</b> Jeśli łączysz się z telefonu, upewnij się, że w Chrome włączono flagę <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code> dla swojego IP.</p>
+
+                    <h3>⚙️ Objaśnienie ikonek bloczków:</h3>
+                    <ul>
+                        <li>🟢 <b>Start:</b> Pierwszy klocek, od niego zaczyna się program.</li>
+                        <li>➡️ <b>Ruch w prawo:</b> Silnik obraca się w prawo (zgodnie ze wskazówkami zegara).</li>
+                        <li>⬅️ <b>Ruch w lewo:</b> Silnik obraca się w lewo.</li>
+                        <li>🛑 <b>Zatrzymaj:</b> Zatrzymuje obracanie silnika.</li>
+                        <li>💡 <b>Dioda LED:</b> Zmienia kolor światła na SmartHubie.</li>
+                        <li>⏳ <b>Czekaj:</b> Wstrzymuje program na określoną liczbę sekund.</li>
+                        <li>🐱 / 🐶 / 🐦 / 🤖 / 🚨 <b>Dźwięki:</b> Odtwarza dźwięk z głośnika telefonu.</li>
+                        <li>🔄 <b>Pętla:</b> Powtarza cały ułożony program w nieskończoność.</li>
+                    </ul>
+
+                    <h3>🤖 Sterowanie i Skręcanie (Ruch w prawo/lewo):</h3>
+                    <p>Aby robot mógł skręcać, musisz podłączyć <b>dwa oddzielne silniki</b> do SmartHuba:</p>
+                    <ul>
+                        <li><b>Silnik Lewy</b> podłącz do <b>Portu 1</b>.</li>
+                        <li><b>Silnik Prawy</b> podłącz do <b>Portu 2</b>.</li>
+                    </ul>
+                    <p>Gdy klikniesz klocek silnika lub stopu na osi czasu, zobaczysz ikonę SmartHuba z dwiema kropkami. Kliknij:</p>
+                    <ul>
+                        <li><b>Lewą kropkę</b>, aby uruchomić/zatrzymać tylko <b>lewy silnik</b> (skręt).</li>
+                        <li><b>Prawą kropkę</b>, aby uruchomić/zatrzymać tylko <b>prawy silnik</b> (skręt).</li>
+                        <li><b>Obie kropki</b> (domyślnie), aby oba silniki jechały prosto.</li>
+                    </ul>
+                    <p><b>Prędkości (zwierzątka):</b> 🐢 wolno, 🐇 średnio, 🐆 szybko.</p>
+                </div>
+                <button id="btn-close-help" class="btn-modal-ok">👍</button>
             </div>
         </div>
     </div>

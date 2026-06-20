@@ -500,6 +500,7 @@ function initModalListeners() {
     document.getElementById('btn-close-led').addEventListener('click', closeAllModals);
     document.getElementById('btn-close-wait').addEventListener('click', closeAllModals);
     document.getElementById('btn-close-sound').addEventListener('click', closeAllModals);
+    document.getElementById('btn-close-help').addEventListener('click', closeAllModals);
     
     // Modal Silnika - Kierunek
     document.querySelectorAll('.dir-btn').forEach(btn => {
@@ -725,6 +726,12 @@ async function runNextStep() {
 document.addEventListener('DOMContentLoaded', () => {
     // Nasłuchiwanie połączenia Bluetooth
     document.getElementById('btn-bluetooth').addEventListener('click', connectToWeDo);
+    
+    // Obsługa kliknięcia przycisku pomocy (instrukcji)
+    document.getElementById('btn-help').addEventListener('click', () => {
+        closeAllModals();
+        document.getElementById('modal-help').classList.remove('hidden');
+    });
     
     // Odtwarzanie i zatrzymywanie
     document.getElementById('btn-play').addEventListener('click', startProgram);

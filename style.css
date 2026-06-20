@@ -413,7 +413,8 @@ body {
 
 /* Szerokie okienko dla silnika (Layout poziomy) */
 .wide-modal {
-    max-width: 440px;
+    max-width: 580px;
+    width: 95%;
 }
 
 .modal-content {
@@ -671,4 +672,77 @@ body {
     background: #ef4444;
     border-color: #ffffff;
     box-shadow: 0 0 6px #ef4444;
+}
+
+/* Pozycjonowanie elementów w prawej części nagłówka */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Styl dla modalu instrukcji rodzica */
+.help-modal {
+    max-width: 540px;
+    width: 90%;
+    max-height: 85dvh;
+    padding: 20px;
+}
+
+.help-modal-header h2 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    text-align: center;
+    color: #ffffff;
+}
+
+.help-modal-content {
+    overflow-y: auto;
+    width: 100%;
+    padding-right: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.help-modal-content::-webkit-scrollbar {
+    width: 4px;
+}
+.help-modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+}
+
+.help-modal-content h3 {
+    font-size: 14px;
+    color: #ffffff;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 4px;
+}
+
+.help-modal-content p {
+    margin-bottom: 8px;
+}
+
+.help-modal-content ul {
+    margin-left: 18px;
+    margin-bottom: 10px;
+}
+
+.help-modal-content li {
+    margin-bottom: 4px;
+}
+
+.help-modal-content b {
+    color: #ffffff;
+}
+
+.help-modal-content code {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #f97316;
 }
