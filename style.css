@@ -498,6 +498,8 @@ body {
     display: flex;
     gap: 8px;
     padding: 4px 0;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .color-btn {
@@ -548,6 +550,8 @@ body {
 .sound-row {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .sound-select-btn {
@@ -745,4 +749,102 @@ body {
     border-radius: 4px;
     font-family: monospace;
     color: #f97316;
+}
+
+/* --- RESPONSIVNESS FOR MOBILE DEVICES --- */
+
+/* 1. Portrait mode (pionowy) / very narrow screens */
+@media (orientation: portrait) or (max-width: 600px) {
+    .horizontal-layout {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .divider-y {
+        width: 80%;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 6px 0;
+        align-self: center;
+    }
+
+    .wide-modal {
+        width: 85%;
+        max-width: 320px;
+    }
+    
+    .port-options, .speed-options, .direction-options {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    /* Shrink timeline blocks slightly on small screens to fit more */
+    .timeline-block {
+        width: 66px;
+        height: 66px;
+        border-radius: 14px;
+    }
+    
+    /* Tighter control panel height */
+    .control-panel {
+        padding: 6px 10px;
+        height: 72px;
+    }
+    
+    .palette-icon-bg {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+    }
+    
+    .btn-play-success {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .btn-stop-danger {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* 2. Landscape mode (poziomy) / very short screens */
+@media (orientation: landscape) and (max-height: 450px) {
+    .modal-card {
+        padding: 10px;
+        gap: 8px;
+        max-height: 92dvh;
+        overflow-y: auto;
+    }
+    
+    .horizontal-layout {
+        gap: 12px;
+    }
+    
+    .dir-btn, .port-btn, .stop-port-btn {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+    }
+    
+    .speed-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+    }
+    
+    .btn-modal-ok {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+    }
+    
+    .divider-y {
+        height: 50px;
+    }
+    
+    .help-modal {
+        max-height: 90dvh;
+    }
 }
