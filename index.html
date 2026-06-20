@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WeDo 2.0 Graficzny Kontroler</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Panel górny: Status połączenia i bateria -->
+        <header class="app-header">
+            <button id="btn-bluetooth" class="btn-header bt-disconnected">
+                <svg class="icon-bt" viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M17.71,7.71L12,2h-1v7.59L6.41,4.59L5,6l6,6l-6,6l1.41,1.41L11,14.41V22h1l5.71-5.71L13.41,12L17.71,7.71z M13,5.83 l1.88,1.88L13,9.59V5.83z M13,18.17v-3.76l1.88,1.88L13,18.17z"/>
+                </svg>
+                <span id="bt-status-text">Połącz klocki</span>
+            </button>
+            <div id="battery-indicator" class="battery-status hidden">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M16 20H8V6H16V20ZM15.5 4H13V2H11V4H8.5C7.67 4 7 4.67 7 5.5V20.5C7 21.33 7.67 22 8.5 22H15.5C16.33 22 17 21.33 17 20.5V5.5C17 4.67 16.33 4 15.5 4Z" fill="#22c55e"/>
+                </svg>
+                <span id="battery-level">100%</span>
+            </div>
+        </header>
+
+        <!-- Sekcja główna: Oś czasu (Program) -->
+        <main class="program-area">
+            <div class="timeline-container">
+                <div id="program-timeline" class="timeline">
+                    <!-- Klocki programu będą tu dodawane dynamicznie -->
+                    <div class="timeline-block start-block" id="start-anchor">
+                        <div class="block-icon">
+                            <svg viewBox="0 0 24 24" width="40" height="40">
+                                <path d="M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z" fill="#22c55e"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Dolny panel: Przyciski kontrolne (Play, Stop, Clear) i Paleta bloczków -->
+        <footer class="control-panel">
+            <div class="actions-row">
+                <button id="btn-clear" class="btn-action btn-clear-danger" title="Wyczyść wszystko">
+                    <svg viewBox="0 0 24 24" width="28" height="28">
+                        <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" fill="#ef4444"/>
+                    </svg>
+                </button>
+                <button id="btn-play" class="btn-action btn-play-success" title="Uruchom program">
+                    <svg viewBox="0 0 24 24" width="48" height="48">
+                        <path d="M8,5.14V19.14L19,12.14L8,5.14Z" fill="#ffffff"/>
+                    </svg>
+                </button>
+                <button id="btn-stop" class="btn-action btn-stop-danger" title="Zatrzymaj">
+                    <svg viewBox="0 0 24 24" width="36" height="36">
+                        <path d="M6,6H18V18H6V6Z" fill="#ffffff"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="palette-scroll-container">
+                <div class="block-palette">
+                    <!-- Bloczki do wyboru -->
+                    <button class="palette-item" data-type="motor" data-dir="right" data-speed="rabbit">
+                        <div class="palette-icon-bg motor-right-bg">
+                            <svg viewBox="0 0 24 24" width="28" height="28">
+                                <!-- Ikona silnika z ruchem w prawo -->
+                                <path d="M19,12A7,7 0 0,1 12,19A7,7 0 0,1 5,12A7,7 0 0,1 12,5A7,7 0 0,1 19,12M2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2A10,10 0 0,0 2,12M15.6,11.3C15.4,11.5 15.1,11.7 14.8,11.8C14.1,12 13.5,12 12.8,12C12.1,12 11.5,11.9 10.9,11.8C10.6,11.7 10.3,11.5 10.1,11.3L12.9,8.5L15.6,11.3Z" fill="#ffffff"/>
+                                <path d="M12,13L8,17H16L12,13Z" fill="#22c55e"/>
+                            </svg>
+                        </div>
+                        <span class="palette-label">Silnik ➡️</span>
+                    </button>
+
+                    <button class="palette-item" data-type="motor" data-dir="left" data-speed="rabbit">
+                        <div class="palette-icon-bg motor-left-bg">
+                            <svg viewBox="0 0 24 24" width="28" height="28">
+                                <!-- Ikona silnika z ruchem w lewo -->
+                                <path d="M19,12A7,7 0 0,1 12,19A7,7 0 0,1 5,12A7,7 0 0,1 12,5A7,7 0 0,1 19,12M2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2A10,10 0 0,0 2,12M15.6,11.3C15.4,11.5 15.1,11.7 14.8,11.8C14.1,12 13.5,12 12.8,12C12.1,12 11.5,11.9 10.9,11.8C10.6,11.7 10.3,11.5 10.1,11.3L12.9,8.5L15.6,11.3Z" fill="#ffffff"/>
+                                <path d="M12,13L8,17H16L12,13Z" fill="#ea580c"/>
+                            </svg>
+                        </div>
+                        <span class="palette-label">Silnik ⬅️</span>
+                    </button>
+
+                    <button class="palette-item" data-type="motor-stop">
+                        <div class="palette-icon-bg stop-bg">
+                            <svg viewBox="0 0 24 24" width="28" height="28">
+                                <path d="M12,2A10,10 0 1,0 22,10A10,10 0 0,0 12,2M12,4A8,8 0 1,1 4,12A8,8 0 0,1 12,4M9,9H15V15H9V9Z" fill="#ffffff"/>
+                            </svg>
+                        </div>
+                        <span class="palette-label">Stop Silnik</span>
+                    </button>
+
+                    <button class="palette-item" data-type="led" data-color="blue">
+                        <div class="palette-icon-bg led-bg">
+                            <svg viewBox="0 0 24 24" width="28" height="28">
+                                <path d="M12,2A7,7 0 0,0 5,9C5,12.63 7.39,15.7 10.76,16.5V19H13.24V16.5C16.61,15.7 19,12.63 19,9A7,7 0 0,0 12,2M11,21H13V22H11V21Z" fill="#ffffff"/>
+                            </svg>
+                        </div>
+                        <span class="palette-label">Światełko</span>
+                    </button>
+
+                    <button class="palette-item" data-type="wait" data-duration="1">
+                        <div class="palette-icon-bg wait-bg">
+                            <svg viewBox="0 0 24 24" width="28" height="28">
+                                <path d="M6 2H18V8H18V8L14 12L18 16V16H18V22H6V16H6V16L10 12L6 8V8H6V2M8 4V7.5L12 11.5L16 7.5V4H8M8 20H16V16.5L12 12.5L8 16.5V20Z" fill="#ffffff"/>
+                            </svg>
+                        </div>
+                        <span class="palette-label">Czekaj</span>
+                    </button>
+
+                    <button class="palette-item" data-type="sound" data-sound="cat">
+                        <div class="palette-icon-bg sound-bg">
+                            <svg viewBox="0 0 24 24" width="28" height="28">
+                                <path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z" fill="#ffffff"/>
+                            </svg>
+                        </div>
+                        <span class="palette-label">Dźwięk</span>
+                    </button>
+                    
+                    <button class="palette-item" data-type="loop">
+                        <div class="palette-icon-bg loop-bg">
+                            <svg viewBox="0 0 24 24" width="28" height="28">
+                                <path d="M19,8l-4,4h3c0,3.31-2.69,6-6,6c-1.01,0-1.97-0.25-2.8-0.7l-1.46,1.46C8.97,19.54,10.43,20,12,20c4.42,0,8-3.58,8-8h3L19,8z M6,12 c0-3.31,2.69-6,6-6c1.01,0,1.97,0.25,2.8,0.7l1.46-1.46C15.03,4.46,13.57,4,12,4c-4.42,0-8,3.58-8,8H1L5,16l4-4H6z" fill="#ffffff"/>
+                            </svg>
+                        </div>
+                        <span class="palette-label">Pętla</span>
+                    </button>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Okienka konfiguracyjne (Modale dla dzieci) -->
+        
+        <!-- Modal: Konfiguracja Silnika -->
+        <div id="modal-motor" class="modal-overlay hidden">
+            <div class="modal-card">
+                <h3>Szybkość i Kierunek</h3>
+                <div class="modal-content">
+                    <!-- Kierunki -->
+                    <div class="setting-group">
+                        <p class="setting-label">Kierunek</p>
+                        <div class="direction-options">
+                            <button id="motor-opt-dir-right" class="dir-btn" data-dir="right">
+                                <svg viewBox="0 0 24 24" width="48" height="48">
+                                    <path d="M19,12l-7-7v4H5v6h7v4L19,12z" fill="#22c55e"/>
+                                </svg>
+                            </button>
+                            <button id="motor-opt-dir-left" class="dir-btn" data-dir="left">
+                                <svg viewBox="0 0 24 24" width="48" height="48">
+                                    <path d="M5,12l7,7v-4h7v-6h-7V5L5,12z" fill="#ea580c"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Prędkości: Żółw, Królik, Gepard -->
+                    <div class="setting-group">
+                        <p class="setting-label">Prędkość</p>
+                        <div class="speed-options">
+                            <button class="speed-btn" data-speed="turtle" title="Powoli (Żółw)">
+                                <span class="speed-emoji">🐢</span>
+                                <span class="speed-desc">Powoli</span>
+                            </button>
+                            <button class="speed-btn" data-speed="rabbit" title="Średnio (Królik)">
+                                <span class="speed-emoji">🐇</span>
+                                <span class="speed-desc">Średnio</span>
+                            </button>
+                            <button class="speed-btn" data-speed="cheetah" title="Szybko (Gepard)">
+                                <span class="speed-emoji">🐆</span>
+                                <span class="speed-desc">Szybko</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <button id="btn-close-motor" class="btn-modal-ok">Gotowe 👍</button>
+            </div>
+        </div>
+
+        <!-- Modal: Konfiguracja Światełka -->
+        <div id="modal-led" class="modal-overlay hidden">
+            <div class="modal-card">
+                <h3>Wybierz kolor światełka</h3>
+                <div class="modal-content">
+                    <div class="color-grid">
+                        <button class="color-btn" data-color-val="pink" style="background-color: #ff007f;" title="Różowy"></button>
+                        <button class="color-btn" data-color-val="purple" style="background-color: #8b5cf6;" title="Fioletowy"></button>
+                        <button class="color-btn" data-color-val="blue" style="background-color: #3b82f6;" title="Niebieski"></button>
+                        <button class="color-btn" data-color-val="cyan" style="background-color: #06b6d4;" title="Błękitny"></button>
+                        <button class="color-btn" data-color-val="green" style="background-color: #10b981;" title="Zielony"></button>
+                        <button class="color-btn" data-color-val="yellow" style="background-color: #fbbf24;" title="Żółty"></button>
+                        <button class="color-btn" data-color-val="orange" style="background-color: #f97316;" title="Pomarańczowy"></button>
+                        <button class="color-btn" data-color-val="red" style="background-color: #ef4444;" title="Czerwony"></button>
+                    </div>
+                </div>
+                <button id="btn-close-led" class="btn-modal-ok">Gotowe 👍</button>
+            </div>
+        </div>
+
+        <!-- Modal: Konfiguracja Czekania -->
+        <div id="modal-wait" class="modal-overlay hidden">
+            <div class="modal-card">
+                <h3>Ile sekund czekać?</h3>
+                <div class="modal-content">
+                    <div class="duration-options">
+                        <button class="dur-btn" data-dur="1">1</button>
+                        <button class="dur-btn" data-dur="2">2</button>
+                        <button class="dur-btn" data-dur="3">3</button>
+                        <button class="dur-btn" data-dur="5">5</button>
+                    </div>
+                </div>
+                <button id="btn-close-wait" class="btn-modal-ok">Gotowe 👍</button>
+            </div>
+        </div>
+
+        <!-- Modal: Konfiguracja Dźwięku -->
+        <div id="modal-sound" class="modal-overlay hidden">
+            <div class="modal-card">
+                <h3>Wybierz dźwięk</h3>
+                <div class="modal-content">
+                    <div class="sound-grid">
+                        <button class="sound-select-btn" data-sound-val="cat" title="Kot">🐱 Kot</button>
+                        <button class="sound-select-btn" data-sound-val="dog" title="Pies">🐶 Pies</button>
+                        <button class="sound-select-btn" data-sound-val="bird" title="Ptak">🐦 Ptak</button>
+                        <button class="sound-select-btn" data-sound-val="robot" title="Robot">🤖 Robot</button>
+                        <button class="sound-select-btn" data-sound-val="alarm" title="Syrena">🚨 Syrena</button>
+                    </div>
+                </div>
+                <button id="btn-close-sound" class="btn-modal-ok">Gotowe 👍</button>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

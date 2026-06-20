@@ -1,0 +1,613 @@
+/* --- Globalne Resetowanie i Zmienne --- */
+:root {
+    --bg-primary: radial-gradient(circle at center, #1e1e38 0%, #0d0e1c 100%);
+    --panel-bg: rgba(26, 27, 50, 0.7);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --text-color: #f1f3f9;
+    --text-secondary: #9aa0c2;
+    
+    /* Kolory klocków */
+    --color-start: #22c55e;
+    --color-motor-right: #10b981;
+    --color-motor-left: #f97316;
+    --color-stop: #ef4444;
+    --color-led: #8b5cf6;
+    --color-wait: #06b6d4;
+    --color-sound: #ec4899;
+    --color-loop: #eab308;
+    
+    --shadow-glow-success: 0 0 15px rgba(34, 197, 94, 0.4);
+    --shadow-glow-danger: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+body {
+    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-color);
+    min-height: 100vh;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
+/* --- Główny Kontener Aplikacji --- */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* --- Panel Górny (Header) --- */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    height: 60px;
+    background: rgba(13, 14, 28, 0.6);
+    border-bottom: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.btn-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bt-disconnected {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bt-disconnected svg {
+    fill: var(--text-secondary);
+}
+
+.bt-connected {
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid var(--color-start);
+    box-shadow: var(--shadow-glow-success);
+    animation: pulse-green 2s infinite;
+}
+
+.bt-connected svg {
+    fill: var(--color-start);
+}
+
+.bt-connecting {
+    background: rgba(234, 179, 8, 0.15);
+    border: 1px solid #eab308;
+    animation: pulse-yellow 1s infinite;
+}
+
+.bt-connecting svg {
+    fill: #eab308;
+}
+
+.battery-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: bold;
+    border: 1px solid var(--border-color);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --- Główna Sekcja Osi Czasu (Program) --- */
+.program-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 20px 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none; /* Firefox */
+}
+
+.program-area::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.timeline-container {
+    display: flex;
+    align-items: center;
+    min-width: 100%;
+    padding: 0 40px;
+}
+
+.timeline {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Bloczki na osi czasu */
+.timeline-block {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.timeline-block:active {
+    transform: scale(0.95);
+}
+
+/* Strzałka łącząca klocki */
+.timeline-block::after {
+    content: "";
+    position: absolute;
+    right: -16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+}
+
+.timeline-block:last-child::after {
+    display: none;
+}
+
+/* Podświetlenie aktywnego bloczka podczas odtwarzania */
+.timeline-block.active-executing {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), inset 0 0 12px rgba(255, 255, 255, 0.3);
+    border-color: #ffffff;
+    transform: scale(1.1);
+}
+
+.start-block {
+    background: var(--color-start);
+    width: 80px;
+    height: 80px;
+}
+
+.block-icon svg {
+    display: block;
+}
+
+.block-param {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 4px;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* Przycisk usuwania klocka */
+.block-delete {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Panel Sterowania i Paleta --- */
+.control-panel {
+    background: var(--panel-bg);
+    border-top: 1px solid var(--border-color);
+    padding: 16px 8px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* Rząd akcji (Główne sterowanie) */
+.actions-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 16px;
+}
+
+.btn-action {
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+
+.btn-action:active {
+    transform: scale(0.9);
+}
+
+.btn-play-success {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--color-start);
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+}
+
+.btn-play-success svg {
+    margin-left: 4px;
+}
+
+.btn-stop-danger {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-stop);
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 6px 18px rgba(239, 68, 68, 0.3);
+}
+
+.btn-clear-danger {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Paleta bloczków na dole */
+.palette-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    padding: 4px 10px;
+}
+
+.palette-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+.block-palette {
+    display: flex;
+    gap: 16px;
+    width: max-content;
+}
+
+.palette-item {
+    background: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.palette-item:active .palette-icon-bg {
+    transform: scale(0.9);
+}
+
+.palette-icon-bg {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+.palette-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* Tła dla konkretnych typów bloczków */
+.motor-right-bg { background: var(--color-motor-right); }
+.motor-left-bg { background: var(--color-motor-left); }
+.stop-bg { background: var(--color-stop); }
+.led-bg { background: var(--color-led); }
+.wait-bg { background: var(--color-wait); }
+.sound-bg { background: var(--color-sound); }
+.loop-bg { background: var(--color-loop); }
+
+/* --- Modale Konfiguracyjne (Dla dzieci) --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(6, 8, 16, 0.7);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    display: none !important;
+}
+
+.modal-card {
+    background: rgba(28, 30, 58, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    border-radius: 28px;
+    width: 90%;
+    max-width: 320px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    animation: modal-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+.modal-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    color: #ffffff;
+}
+
+.modal-content {
+    width: 100%;
+}
+
+.setting-group {
+    width: 100%;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.setting-group:last-child {
+    margin-bottom: 0;
+}
+
+.setting-label {
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+/* Opcje prędkości (Żółw, Królik, Gepard) */
+.speed-options {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    gap: 12px;
+}
+
+.speed-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 12px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.speed-btn:active, .speed-btn.selected {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #ffffff;
+    transform: scale(0.95);
+}
+
+.speed-emoji {
+    font-size: 28px;
+}
+
+.speed-desc {
+    font-size: 10px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* Opcje kierunku */
+.direction-options {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.dir-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 18px;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dir-btn.selected {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #ffffff;
+}
+
+/* Siatka kolorów */
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    width: 100%;
+}
+
+.color-btn {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.color-btn.selected {
+    border-color: #ffffff;
+    transform: scale(1.1);
+    box-shadow: 0 0 12px rgba(255,255,255,0.4);
+}
+
+/* Opcje czasu (Czekanie) */
+.duration-options {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+}
+
+.dur-btn {
+    flex: 1;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 22px;
+    font-weight: bold;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dur-btn.selected {
+    background: var(--color-wait);
+    border-color: #ffffff;
+    color: #000000;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+}
+
+/* Siatka dźwięków */
+.sound-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.sound-select-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 16px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sound-select-btn.selected {
+    background: var(--color-sound);
+    border-color: #ffffff;
+    box-shadow: 0 0 10px rgba(236, 72, 153, 0.3);
+}
+
+/* Przycisk akceptacji w modalu */
+.btn-modal-ok {
+    background: #ffffff;
+    border: none;
+    border-radius: 20px;
+    color: #0b0d19;
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: 700;
+    width: 100%;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.15);
+    transition: transform 0.2s ease;
+}
+
+.btn-modal-ok:active {
+    transform: scale(0.95);
+}
+
+/* --- Klucze Animacji (Keyframes) --- */
+@keyframes pop-in {
+    0% { transform: scale(0); opacity: 0; }
+    80% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes modal-pop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+    70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+@keyframes pulse-yellow {
+    0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.5); }
+    70% { box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
+}
