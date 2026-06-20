@@ -1,7 +1,7 @@
 /* --- Globalne Resetowanie i Zmienne --- */
 :root {
     --bg-primary: radial-gradient(circle at center, #1b1b32 0%, #080914 100%);
-    --panel-bg: rgba(22, 23, 42, 0.85);
+    --panel-bg: rgba(22, 23, 42, 0.9);
     --border-color: rgba(255, 255, 255, 0.08);
     --text-color: #f1f3f9;
     --text-secondary: #8e95be;
@@ -31,7 +31,7 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg-primary);
+    background: #080914; /* Twarde tło jako fallback */
     color: var(--text-color);
     min-height: 100vh;
     overflow: hidden;
@@ -45,6 +45,7 @@ body {
     flex-direction: column;
     height: 100vh;
     width: 100%;
+    background: var(--bg-primary); /* Poprawka: Ciemne tło na całym kontenerze */
 }
 
 /* --- Zminimalizowany Nagłówek --- */
@@ -119,19 +120,30 @@ body {
     display: none !important;
 }
 
-/* --- Oś Czasu (Kompresja wymiarów pod małe ekrany) --- */
+/* --- Oś Czasu --- */
 .program-area {
     flex: 1;
     display: flex;
     align-items: center;
     overflow-x: auto;
     overflow-y: hidden;
-    scrollbar-width: none;
     padding: 10px 0;
 }
 
+/* Subtelny pasek przewijania ułatwiający nawigację na PC i telefonach */
 .program-area::-webkit-scrollbar {
-    display: none;
+    display: block;
+    height: 5px;
+}
+.program-area::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.01);
+}
+.program-area::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+}
+.program-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .timeline-container {
@@ -200,13 +212,17 @@ body {
     display: block;
 }
 
-.block-param {
-    font-size: 11px;
-    font-weight: bold;
-    margin-top: 3px;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 1px 6px;
-    border-radius: 8px;
+/* Kółko z parametrem (emotka / cyfra) na klocku - nałożone w rogu bez tekstu do czytania */
+.block-param-icon {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    font-size: 13px;
+    line-height: 1;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 2px 4px;
+    border-radius: 6px;
+    font-family: inherit;
 }
 
 .block-delete {
@@ -300,13 +316,20 @@ body {
     flex: 1;
     overflow-x: auto;
     overflow-y: hidden;
-    scrollbar-width: none;
     margin-left: 12px;
     padding: 4px 0;
 }
 
 .palette-scroll-container::-webkit-scrollbar {
-    display: none;
+    display: block;
+    height: 4px;
+}
+.palette-scroll-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.01);
+}
+.palette-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
 }
 
 .block-palette {
