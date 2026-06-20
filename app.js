@@ -275,10 +275,24 @@ function renderTimeline() {
             const speedEmoji = block.speed === 'turtle' ? '🐢' : (block.speed === 'rabbit' ? '🐇' : '🐆');
             bgColor = block.dir === 'right' ? 'var(--color-motor-right)' : 'var(--color-motor-left)';
             
+            const arrowPath = block.dir === 'right' 
+                ? 'M12,2 A10,10 0 0,1 22,12' 
+                : 'M12,2 A10,10 0 0,0 2,12';
+            const headPath = block.dir === 'right' 
+                ? 'M22,9 L22,14 L17,13 Z' 
+                : 'M2,9 L2,14 L7,13 Z';
+            
             innerHTML += `
                 <div class="block-icon">
                     <svg viewBox="0 0 24 24" width="36" height="36">
-                        <path d="M19,12A7,7 0 0,1 12,19A7,7 0 0,1 5,12A7,7 0 0,1 12,5A7,7 0 0,1 19,12M2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2A10,10 0 0,0 2,12M15.6,11.3C15.4,11.5 15.1,11.7 14.8,11.8C14.1,12 13.5,12 12.8,12C12.1,12 11.5,11.9 10.9,11.8C10.6,11.7 10.3,11.5 10.1,11.3L12.9,8.5L15.6,11.3Z" fill="#ffffff"/>
+                        <circle cx="12" cy="12" r="3" fill="#ffffff"/>
+                        <circle cx="12" cy="12" r="6" fill="none" stroke="#ffffff" stroke-width="2"/>
+                        <line x1="12" y1="2" x2="12" y2="6" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="12" y1="18" x2="12" y2="22" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="2" y1="12" x2="6" y2="12" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="18" y1="12" x2="22" y2="12" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                        <path d="${arrowPath}" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+                        <path d="${headPath}" fill="#ffffff"/>
                     </svg>
                 </div>
                 <div class="block-param">${arrowDir} ${speedEmoji}</div>
@@ -288,7 +302,8 @@ function renderTimeline() {
             innerHTML += `
                 <div class="block-icon">
                     <svg viewBox="0 0 24 24" width="36" height="36">
-                        <path d="M12,2A10,10 0 1,0 22,10A10,10 0 0,0 12,2M12,4A8,8 0 1,1 4,12A8,8 0 0,1 12,4M9,9H15V15H9V9Z" fill="#ffffff"/>
+                        <polygon points="8,2 16,2 22,8 22,16 16,22 8,22 2,16 2,8" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+                        <path d="M12,6 A2,2 0 0,1 14,8 L14,11 A1,1 0 0,1 15,12 A1,1 0 0,1 16,13 L16,15 A4,4 0 0,1 12,19 L12,19 A4,4 0 0,1 8,15 L8,10 A2,2 0 0,1 10,8 A2,2 0 0,1 12,6 Z" fill="#ffffff"/>
                     </svg>
                 </div>
                 <div class="block-param">🛑</div>
