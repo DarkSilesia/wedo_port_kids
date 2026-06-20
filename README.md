@@ -1,31 +1,24 @@
 # 🤖 LEGO WeDo 2.0 – Graficzny Kontroler Web Bluetooth (PWA)
 
-Projekt to nowoczesna, w pełni graficzna (obrazkowa) aplikacja webowa stworzona do programowania i sterowania zestawem **LEGO WeDo 2.0 SmartHub** bezpośrednio ze smartfona (lub komputera) za pomocą przeglądarki internetowej.
+### 🚀 **[KLIKNIJ TUTAJ, ABY OTWORZYĆ APLIKACJĘ (LIVE DEMO)](https://darksilesia.github.io/wedo_port_kids/)**
 
-Aplikacja została zaprojektowana specjalnie z myślą o dzieciach w wieku przedszkolnym i wczesnoszkolnym, które nie potrafią jeszcze czytać – **interfejs nie zawiera żadnego tekstu**, a cała logika programowania opiera się na intuicyjnych ikonach, kolorach oraz emotkach.
+Projekt to nowoczesna, w pełni graficzna (obrazkowa) aplikacja webowa stworzona do programowania i sterowania zestawem **LEGO WeDo 2.0 SmartHub** bezpośrednio z poziomu smartfona lub komputera za pomocą technologii Web Bluetooth.
+
+Aplikacja została zaprojektowana specjalnie z myślą o dzieciach w wieku przedszkolnym i wczesnoszkolnym, które nie potrafią jeszcze czytać – **interfejs programowania nie zawiera żadnego tekstu**, a cała logika opiera się na intuicyjnych ikonach, kolorach, świecących wskaźnikach i emotkach. Dla rodziców przygotowano wbudowaną instrukcję obsługi dostępną bezpośrednio pod ikoną **`?`** w nagłówku.
 
 ---
 
 ## ✨ Główne Funkcje
 
-*   **100% Graficzny UX:** Brak słów w całym panelu programowania oraz modali konfiguracyjnych.
-*   **Intuicyjne Ikony Silnika:** Zamiast kół zębatych, kierunek obrotów silnika sygnalizowany jest grubymi strzałkami (`→` w prawo na zielonym tle, `←` w lewo na pomarańczowym tle).
-*   **Dopasowane pod Smartfony (Landscape):** Układ zoptymalizowany dla małych ekranów w orientacji poziomej (spłaszczone okienka modalne, niski profil nagłówka i panelu sterowania).
+*   **100% Graficzny UX:** Brak słów w całym panelu programowania oraz modali konfiguracyjnych dla dzieci.
+*   **Sterowanie i Skręcanie (Niezależne Silniki):** Wsparcie dla niezależnego sterowania silnikami podłączonymi pod Port 1 (Lewy), Port 2 (Prawy) lub oba porty jednocześnie. Umożliwia to pełną mobilność pojazdu (jazda prosto, zakręty, obrót w miejscu).
+*   **Wizualny Wskaźnik Portów:** Małe kropki nad klockami ruchu i zatrzymania silnika na osi czasu świecą się (na zielono/czerwono), pokazując dziecku, który silnik zostanie uruchomiony lub zatrzymany w danym kroku.
 *   **Prędkość jako Zwierzątka:** Dziecko wybiera prędkość silnika za pomocą powszechnie znanych symboli: żółwia (powoli 🐢), królika (średnio 🐇) oraz geparda (szybko 🐆).
-*   **Wbudowane Dźwięki:** Odtwarzanie odgłosów zwierząt (kot 🐱, pies 🐶, ptak 🐦), syreny 🚨 lub dźwięków robota 🤖 bezpośrednio z głośnika telefonu (z użyciem systemowego *Web Audio API* – brak konieczności pobierania plików mp3).
+*   **Wbudowane Dźwięki:** Odtwarzanie odgłosów zwierząt (kot 🐱, pies 🐶, ptak 🐦), syreny 🚨 lub dźwięków robota 🤖 bezpośrednio z głośnika telefonu (z użyciem systemowego *Web Audio API* – brak konieczności pobierania plików audio).
+*   **Instrukcja dla Rodzica:** Dostępna pod ikoną **`?`** w nagłówku – zawiera pełny słowniczek ikon, wyjaśnienie trybu skręcania oraz wskazówki konfiguracji połączenia.
+*   **Wykrywanie Kompatybilności:** Aplikacja automatycznie wykrywa na telefonach nieobsługiwane przeglądarki (np. Edge, Firefox, Safari) i natychmiast wyświetla rodzicowi instrukcję wdrożenia odpowiedniej przeglądarki (Chrome na Androidzie, Bluefy na iOS).
 *   **Standard PWA (Progressive Web App):** Możliwość zainstalowania aplikacji na ekranie głównym telefonu z dedykowaną ikoną robota, po czym uruchamia się ona w pełnym ekranie i działa offline.
-*   **Uproszczona Kontrola:** Aplikacja automatycznie wysyła sygnały sterujące na oba porty SmartHuba (Port 1 i Port 2), eliminując potrzebę ręcznego przypisywania kabli.
-
----
-
-## 📂 Struktura Plików
-
-*   `index.html` – Struktura widoku aplikacji, w tym modale konfiguracyjne oraz ikony wektorowe (SVG).
-*   `style.css` – Stylizacja w estetyce *dark glassmorphism*, efekty sprężynujących przycisków i responsywność pod ekrany mobilne.
-*   `app.js` – Logika połączenia Web Bluetooth, silnik wykonujący sekwencje klocków, generator dźwięków i zarządca osi czasu.
-*   `manifest.json` – Plik konfiguracyjny PWA (ikony, kolory tła, orientacja).
-*   `icon.png` / `icon-512.png` – Ikona aplikacji na ekran główny telefonu.
-*   `server.py` – Lekki serwer deweloperski w Pythonie.
+*   **Wysoka Responsywność:** Specjalne tryby wyświetlania dla ekranów pionowych (portretowych) i poziomych (krajobrazowych) zapobiegają ucinaniu elementów interfejsu i ułatwiają sterowanie.
 
 ---
 
@@ -38,31 +31,29 @@ Aby uruchomić aplikację na komputerze i przetestować ją lokalnie:
     ```bash
     python server.py
     ```
-3.  Przeglądarka automatycznie otworzy stronę pod adresem **`http://localhost:8000`**.
+3.  Przeglądarka automatycznie otworzy stronę pod adresem **`http://localhost:8080`**.
 4.  Włącz Bluetooth w komputerze, włącz klocek WeDo 2.0 i kliknij ikonę Bluetooth w lewym górnym rogu aplikacji, aby sparować urządzenie.
 
 ---
 
 ## 📱 Uruchamianie na Telefonie (Wdrożenie HTTPS)
 
-Technologia **Web Bluetooth API** wymaga bezpiecznego połączenia **HTTPS**, aby działać na urządzeniach mobilnych. Najprostszym sposobem na uruchomienie aplikacji na smartfonie jest umieszczenie jej na darmowym hostingu:
+Technologia **Web Bluetooth API** ze względów bezpieczeństwa wymaga szyfrowanego połączenia **HTTPS**, aby działać na urządzeniach mobilnych. 
 
-### Wdrożenie na GitHub Pages (Zalecane)
+Darmowe wdrożenie na GitHub Pages zostało już skonfigurowane w tym repozytorium. Każdy `git push` na gałąź `main` automatycznie aktualizuje wersję online dostępną pod adresem:
+👉 **`https://darksilesia.github.io/wedo_port_kids/`**
 
-1.  Zaloguj się na **[github.com](https://github.com)** i utwórz **publiczne** repozytorium (np. `wedo_port`).
-2.  Połącz swój lokalny folder z nowo utworzonym repozytorium i wyślij pliki:
-    ```bash
-    git remote add origin https://github.com/<TWÓJ_LOGIN>/<NAZWA_REPOZYTORIUM>.git
-    git push -u origin main
-    ```
-3.  W ustawieniach repozytorium na GitHubie wejdź w zakładkę **`Settings -> Pages`**.
-4.  W sekcji *Build and deployment -> Branch* wybierz gałąź **`main`** (lub `master`) oraz katalog `/ (root)` i kliknij **`Save`**.
-5.  Po minucie strona będzie gotowa pod adresem:
-    `https://<TWÓJ_LOGIN>.github.io/<NAZWA_REPOZYTORIUM>/`
+### Instalacja i uruchomienie na telefonie:
+*   🤖 **Android:** Otwórz link w przeglądarce **Google Chrome**. Z menu przeglądarki wybierz **„Dodaj do ekranu głównego”** (lub kliknij baner instalacji). Aplikacja pojawi się na pulpicie telefonu i będzie uruchamiać się w trybie pełnoekranowym bez paska przeglądarki.
+*   🍏 **iOS (iPhone/iPad):** Domyślne przeglądarki na iOS (Safari, Chrome, Edge) nie obsługują Web Bluetooth. Pobierz darmową aplikację **Bluefy - Web Bluetooth Browser** z App Store, otwórz w niej powyższy link HTTPS i korzystaj z kontrolera.
 
-### Instalacja jako Aplikacja:
-*   **Android:** Otwórz link w przeglądarce **Google Chrome**. Z menu przeglądarki wybierz **„Dodaj do ekranu głównego”** (lub kliknij baner instalacyjny). Aplikacja pojawi się na pulpicie telefonu i będzie uruchamiać się w trybie pełnoekranowym bez paska przeglądarki.
-*   **iOS (iPhone):** Domyślna przeglądarka Safari nie wspiera technologii Web Bluetooth. Pobierz darmową aplikację **Bluefy** z App Store, otwórz w niej swój adres HTTPS i korzystaj z kontrolera.
+> [!IMPORTANT]
+> **Testowanie lokalne przez Wi-Fi (bez GitHuba):**
+> Jeśli chcesz przetestować lokalny serwer uruchomiony na komputerze na telefonie przez Wi-Fi, musisz zezwolić w Chrome na telefonie na niezabezpieczone pochodzenie.
+> 1. Otwórz w Chrome na telefonie adres: `chrome://flags`
+> 2. Wyszukaj flagę: `unsafely-treat-insecure-origin-as-secure`
+> 3. Włącz ją (**Enabled**) i wklej adres komputera, np.: `http://192.168.1.XXX:8080`
+> 4. Zrestartuj przeglądarkę przyciskiem **Relaunch**.
 
 ---
 
@@ -72,8 +63,10 @@ Aplikacja komunikuje się bezpośrednio z usługami GATT klocka SmartHub za pomo
 
 *   **Usługa Kontrolna (Service UUID):** `00004f0e-1212-efde-1523-785feabcd123`
 *   **Charakterystyka Zapisu (Characteristic UUID):** `00001565-1212-efde-1523-785feabcd123`
-*   **Wysyłane pakiety bajtów (Write):**
-    *   **Uruchomienie silnika (Port 1):** `[0x01, 0x01, 0x01, <predkosc>]`
-    *   **Uruchomienie silnika (Port 2):** `[0x02, 0x01, 0x01, <predkosc>]`
-    *   **Zatrzymanie silnika (Port 1):** `[0x01, 0x01, 0x01, 0x00]`
-    *   **Kolor diody LED (Port 6):** `[0x06, 0x04, 0x01, <color_index>]`
+*   **Wysyłane pakiety bajtów (Write Payload):**
+    *   **Silnik Port 1 (Lewy):** `[0x01, 0x01, 0x01, <prędkość>]`
+    *   **Silnik Port 2 (Prawy):** `[0x02, 0x01, 0x01, <prędkość>]`
+    *   *Uwaga:* Prędkość w prawo przyjmuje wartości `0 - 100`, natomiast w lewo obliczana jest w systemie uzupełnień do 256 (`256 - prędkość`).
+    *   **Zatrzymanie Silnika (Port 1):** `[0x01, 0x01, 0x01, 0x00]`
+    *   **Zatrzymanie Silnika (Port 2):** `[0x02, 0x01, 0x01, 0x00]`
+    *   **Kolor diody LED (Port 6):** `[0x06, 0x04, 0x01, <color_byte>]`
