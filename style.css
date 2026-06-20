@@ -1,10 +1,10 @@
 /* --- Globalne Resetowanie i Zmienne --- */
 :root {
-    --bg-primary: radial-gradient(circle at center, #1e1e38 0%, #0d0e1c 100%);
-    --panel-bg: rgba(26, 27, 50, 0.7);
+    --bg-primary: radial-gradient(circle at center, #1b1b32 0%, #080914 100%);
+    --panel-bg: rgba(22, 23, 42, 0.85);
     --border-color: rgba(255, 255, 255, 0.08);
     --text-color: #f1f3f9;
-    --text-secondary: #9aa0c2;
+    --text-secondary: #8e95be;
     
     /* Kolory klocków */
     --color-start: #22c55e;
@@ -16,8 +16,8 @@
     --color-sound: #ec4899;
     --color-loop: #eab308;
     
-    --shadow-glow-success: 0 0 15px rgba(34, 197, 94, 0.4);
-    --shadow-glow-danger: 0 0 15px rgba(239, 68, 68, 0.4);
+    --shadow-glow-success: 0 0 12px rgba(34, 197, 94, 0.5);
+    --shadow-glow-danger: 0 0 12px rgba(239, 68, 68, 0.5);
 }
 
 * {
@@ -30,7 +30,7 @@
 }
 
 body {
-    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg-primary);
     color: var(--text-color);
     min-height: 100vh;
@@ -39,44 +39,42 @@ body {
     width: 100%;
 }
 
-/* --- Główny Kontener Aplikacji --- */
+/* --- Główny Kontener (Zoptymalizowany pod Landscape) --- */
 .app-container {
     display: flex;
     flex-direction: column;
     height: 100vh;
     width: 100%;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
-/* --- Panel Górny (Header) --- */
+/* --- Zminimalizowany Nagłówek --- */
 .app-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
-    height: 60px;
-    background: rgba(13, 14, 28, 0.6);
+    padding: 6px 12px;
+    height: 38px;
+    background: rgba(8, 9, 20, 0.7);
     border-bottom: 1px solid var(--border-color);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10;
 }
 
 .btn-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
     border: none;
-    border-radius: 20px;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #ffffff;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
 }
 
 .bt-disconnected {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -85,7 +83,7 @@ body {
 }
 
 .bt-connected {
-    background: rgba(34, 197, 94, 0.15);
+    background: rgba(34, 197, 94, 0.2);
     border: 1px solid var(--color-start);
     box-shadow: var(--shadow-glow-success);
     animation: pulse-green 2s infinite;
@@ -96,7 +94,7 @@ body {
 }
 
 .bt-connecting {
-    background: rgba(234, 179, 8, 0.15);
+    background: rgba(234, 179, 8, 0.2);
     border: 1px solid #eab308;
     animation: pulse-yellow 1s infinite;
 }
@@ -108,11 +106,11 @@ body {
 .battery-status {
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 6px 12px;
-    border-radius: 15px;
-    font-size: 13px;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
     font-weight: bold;
     border: 1px solid var(--border-color);
 }
@@ -121,66 +119,64 @@ body {
     display: none !important;
 }
 
-/* --- Główna Sekcja Osi Czasu (Program) --- */
+/* --- Oś Czasu (Kompresja wymiarów pod małe ekrany) --- */
 .program-area {
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
-    position: relative;
-    padding: 20px 0;
     overflow-x: auto;
     overflow-y: hidden;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
+    padding: 10px 0;
 }
 
 .program-area::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
 }
 
 .timeline-container {
     display: flex;
     align-items: center;
     min-width: 100%;
-    padding: 0 40px;
+    padding: 0 30px;
 }
 
 .timeline {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
 }
 
-/* Bloczki na osi czasu */
+/* Bloczki o zmniejszonych wymiarach pod telefon (70px) */
 .timeline-block {
     position: relative;
-    width: 90px;
-    height: 90px;
-    border-radius: 20px;
+    width: 70px;
+    height: 70px;
+    border-radius: 16px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
     border: 2px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+    animation: pop-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.25);
 }
 
 .timeline-block:active {
     transform: scale(0.95);
 }
 
-/* Strzałka łącząca klocki */
+/* Krótka strzałka łącząca */
 .timeline-block::after {
     content: "";
     position: absolute;
-    right: -16px;
+    right: -12px;
     top: 50%;
     transform: translateY(-50%);
-    width: 16px;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.15);
+    width: 12px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.12);
     border-radius: 3px;
 }
 
@@ -188,17 +184,16 @@ body {
     display: none;
 }
 
-/* Podświetlenie aktywnego bloczka podczas odtwarzania */
 .timeline-block.active-executing {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), inset 0 0 12px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 18px rgba(255, 255, 255, 0.45);
     border-color: #ffffff;
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
 .start-block {
     background: var(--color-start);
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
 }
 
 .block-icon svg {
@@ -206,50 +201,54 @@ body {
 }
 
 .block-param {
-    font-size: 14px;
+    font-size: 11px;
     font-weight: bold;
-    margin-top: 4px;
-    background: rgba(0, 0, 0, 0.25);
-    padding: 2px 8px;
-    border-radius: 10px;
+    margin-top: 3px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1px 6px;
+    border-radius: 8px;
 }
 
-/* Przycisk usuwania klocka */
 .block-delete {
     position: absolute;
-    top: -8px;
-    right: -8px;
-    width: 24px;
-    height: 24px;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
     background: #ef4444;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #ffffff;
+    border: 1.5px solid #ffffff;
     color: #ffffff;
     font-weight: bold;
-    font-size: 12px;
+    font-size: 10px;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 5;
 }
 
-/* --- Panel Sterowania i Paleta --- */
+/* --- Dolny Panel (Landscape: 76px) --- */
 .control-panel {
     background: var(--panel-bg);
     border-top: 1px solid var(--border-color);
-    padding: 16px 8px;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    padding: 8px 12px;
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 10;
 }
 
-/* Rząd akcji (Główne sterowanie) */
+/* Główne Przyciski wykonania po lewej */
 .actions-row {
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 24px;
-    margin-bottom: 16px;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .btn-action {
@@ -258,8 +257,8 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
 }
 
 .btn-action:active {
@@ -267,42 +266,43 @@ body {
 }
 
 .btn-play-success {
-    width: 72px;
-    height: 72px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     background: var(--color-start);
-    border: 4px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
 }
 
 .btn-play-success svg {
-    margin-left: 4px;
+    margin-left: 2px;
 }
 
 .btn-stop-danger {
-    width: 56px;
-    height: 56px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: var(--color-stop);
-    border: 3px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 6px 18px rgba(239, 68, 68, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
 }
 
 .btn-clear-danger {
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Paleta bloczków na dole */
+/* Paleta Bloczków po prawej */
 .palette-scroll-container {
-    width: 100%;
+    flex: 1;
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
-    padding: 4px 10px;
+    margin-left: 12px;
+    padding: 4px 0;
 }
 
 .palette-scroll-container::-webkit-scrollbar {
@@ -311,7 +311,7 @@ body {
 
 .block-palette {
     display: flex;
-    gap: 16px;
+    gap: 10px;
     width: max-content;
 }
 
@@ -319,11 +319,7 @@ body {
     background: transparent;
     border: none;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
     cursor: pointer;
-    transition: transform 0.2s ease;
 }
 
 .palette-item:active .palette-icon-bg {
@@ -331,24 +327,18 @@ body {
 }
 
 .palette-icon-bg {
-    width: 60px;
-    height: 60px;
-    border-radius: 16px;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.08);
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2);
 }
 
-.palette-label {
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-/* Tła dla konkretnych typów bloczków */
+/* Tła klocków */
 .motor-right-bg { background: var(--color-motor-right); }
 .motor-left-bg { background: var(--color-motor-left); }
 .stop-bg { background: var(--color-stop); }
@@ -357,22 +347,22 @@ body {
 .sound-bg { background: var(--color-sound); }
 .loop-bg { background: var(--color-loop); }
 
-/* --- Modale Konfiguracyjne (Dla dzieci) --- */
+/* --- Modale Konfiguracyjne (Spłaszczone dla wysokości telefonu w poziomie) --- */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(6, 8, 16, 0.7);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: rgba(5, 6, 12, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 100;
     opacity: 1;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.2s ease;
 }
 
 .modal-overlay.hidden {
@@ -382,102 +372,60 @@ body {
 }
 
 .modal-card {
-    background: rgba(28, 30, 58, 0.9);
-    border: 2px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-    border-radius: 28px;
-    width: 90%;
-    max-width: 320px;
-    padding: 24px;
+    background: rgba(22, 24, 45, 0.95);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    border-radius: 24px;
+    width: auto;
+    padding: 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    animation: modal-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+    gap: 12px;
+    animation: modal-pop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15);
 }
 
-.modal-card h3 {
-    font-size: 18px;
-    font-weight: 700;
-    text-align: center;
-    color: #ffffff;
+/* Szerokie okienko dla silnika (Layout poziomy) */
+.wide-modal {
+    max-width: 440px;
 }
 
 .modal-content {
     width: 100%;
-}
-
-.setting-group {
-    width: 100%;
-    margin-bottom: 16px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    justify-content: center;
 }
 
-.setting-group:last-child {
+/* Horyzontalny układ kontrolek silnika */
+.horizontal-layout {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+}
+
+.compact-group {
     margin-bottom: 0;
 }
 
-.setting-label {
-    font-size: 12px;
-    font-weight: bold;
-    color: var(--text-secondary);
-    text-transform: uppercase;
+.divider-y {
+    width: 1px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.1);
+    align-self: center;
 }
 
-/* Opcje prędkości (Żółw, Królik, Gepard) */
-.speed-options {
+/* Opcje kierunku silnika */
+.direction-options {
     display: flex;
-    justify-content: space-around;
-    width: 100%;
     gap: 12px;
 }
 
-.speed-btn {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 12px 6px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.speed-btn:active, .speed-btn.selected {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: #ffffff;
-    transform: scale(0.95);
-}
-
-.speed-emoji {
-    font-size: 28px;
-}
-
-.speed-desc {
-    font-size: 10px;
-    font-weight: 600;
-    color: #ffffff;
-}
-
-/* Opcje kierunku */
-.direction-options {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
 .dir-btn {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.04);
     border: 2px solid transparent;
-    border-radius: 18px;
-    width: 72px;
-    height: 72px;
+    border-radius: 16px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -486,47 +434,73 @@ body {
 }
 
 .dir-btn.selected {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.12);
     border-color: #ffffff;
 }
 
-/* Siatka kolorów */
-.color-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    width: 100%;
+/* Opcje prędkości (Zwierzątka) */
+.speed-options {
+    display: flex;
+    gap: 8px;
+}
+
+.speed-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 2px solid transparent;
+    border-radius: 16px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.speed-btn:active, .speed-btn.selected {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #ffffff;
+}
+
+.speed-emoji {
+    font-size: 26px;
+}
+
+/* Pojedyncza linia kolorów w poziomie */
+.color-row {
+    display: flex;
+    gap: 8px;
+    padding: 4px 0;
 }
 
 .color-btn {
-    aspect-ratio: 1;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    border: 3px solid transparent;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    border: 2px solid transparent;
     cursor: pointer;
     transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .color-btn.selected {
     border-color: #ffffff;
-    transform: scale(1.1);
-    box-shadow: 0 0 12px rgba(255,255,255,0.4);
+    transform: scale(1.15);
+    box-shadow: 0 0 10px rgba(255,255,255,0.4);
 }
 
-/* Opcje czasu (Czekanie) */
+/* Pojedyncza linia dla czasu czekania */
 .duration-options {
     display: flex;
-    justify-content: space-around;
-    gap: 10px;
+    gap: 8px;
 }
 
 .dur-btn {
-    flex: 1;
-    aspect-ratio: 1;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 22px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 18px;
     font-weight: bold;
     color: #ffffff;
     cursor: pointer;
@@ -540,25 +514,25 @@ body {
     background: var(--color-wait);
     border-color: #ffffff;
     color: #000000;
-    box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
 }
 
-/* Siatka dźwięków */
-.sound-grid {
+/* Pojedyncza linia emotek dźwięków w poziomie */
+.sound-row {
     display: flex;
-    flex-direction: column;
     gap: 10px;
-    width: 100%;
 }
 
 .sound-select-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    border: 2px solid transparent;
     border-radius: 16px;
-    padding: 12px 16px;
-    text-align: left;
-    font-size: 16px;
-    color: #ffffff;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -566,19 +540,21 @@ body {
 .sound-select-btn.selected {
     background: var(--color-sound);
     border-color: #ffffff;
-    box-shadow: 0 0 10px rgba(236, 72, 153, 0.3);
+    box-shadow: 0 0 10px rgba(236, 72, 153, 0.4);
 }
 
-/* Przycisk akceptacji w modalu */
+/* Mały okrągły przycisk akceptacji */
 .btn-modal-ok {
     background: #ffffff;
     border: none;
-    border-radius: 20px;
+    border-radius: 50%;
     color: #0b0d19;
-    padding: 14px 28px;
-    font-size: 16px;
-    font-weight: 700;
-    width: 100%;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(255, 255, 255, 0.15);
     transition: transform 0.2s ease;
@@ -591,23 +567,23 @@ body {
 /* --- Klucze Animacji (Keyframes) --- */
 @keyframes pop-in {
     0% { transform: scale(0); opacity: 0; }
-    80% { transform: scale(1.1); }
+    80% { transform: scale(1.08); }
     100% { transform: scale(1); opacity: 1; }
 }
 
 @keyframes modal-pop {
-    0% { transform: scale(0.85); opacity: 0; }
+    0% { transform: scale(0.9); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
 }
 
 @keyframes pulse-green {
-    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
-    70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
     100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
 }
 
 @keyframes pulse-yellow {
-    0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.5); }
-    70% { box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(234, 179, 8, 0); }
     100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
 }

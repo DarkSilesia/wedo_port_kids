@@ -149,7 +149,7 @@ async function connectToWeDo() {
     const statusText = document.getElementById('bt-status-text');
     
     try {
-        statusText.innerText = "Skanowanie...";
+        if (statusText) statusText.innerText = "Skanowanie...";
         btnBt.className = "btn-header bt-connecting";
         
         state.device = await navigator.bluetooth.requestDevice({
@@ -162,7 +162,7 @@ async function connectToWeDo() {
         
         state.device.addEventListener('gattserverdisconnected', onDisconnected);
         
-        statusText.innerText = "Łączenie...";
+        if (statusText) statusText.innerText = "Łączenie...";
         const server = await state.device.gatt.connect();
         
         // Pobierz główny serwis kontroli
@@ -171,7 +171,7 @@ async function connectToWeDo() {
         
         state.isConnected = true;
         btnBt.className = "btn-header bt-connected";
-        statusText.innerText = "Połączono!";
+        if (statusText) statusText.innerText = "Połączono!";
         
         // Pobierz status baterii (opcjonalnie)
         try {
@@ -208,7 +208,7 @@ function onDisconnected() {
     const batteryInd = document.getElementById('battery-indicator');
     
     btnBt.className = "btn-header bt-disconnected";
-    statusText.innerText = "Połącz klocki";
+    if (statusText) statusText.innerText = "Połącz klocki";
     batteryInd.classList.add('hidden');
     
     if (state.isRunning) {
