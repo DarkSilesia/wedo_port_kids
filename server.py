@@ -2,12 +2,26 @@ import http.server
 import socketserver
 import webbrowser
 import os
+import socket
 
 PORT = 8000
 
+# Metoda bezpiecznego wykrywania lokalnego adresu IP komputera w sieci Wi-Fi/LAN
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # Łączymy się z fikcyjnym adresem, aby wyciągnąć interfejs sieciowy używany przez system
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
+
 class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
-        # Dodajemy nagłówek zapobiegający keszowaniu podczas rozwoju aplikacji
+        # Wyłączenie keszowania plików w przeglądarce podczas prac programistycznych
         self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
         self.send_header("Pragma", "no-cache")
         self.send_header("Expires", "0")
@@ -17,17 +31,28 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 Handler = MyHTTPRequestHandler
+local_ip = get_local_ip()
 
-with socketserver.TCPServer(("", PORT), Handler) as httpd:
+# Ustawiamy ponowne użycie portu, aby uniknąć błędów blokowania portu ("address already in use")
+socketserver.TCPServer.allow_reuse_address = True
+
+# Powiązanie z "0.0.0.0" sprawia, że serwer jest widoczny dla całej sieci lokalnej (Wi-Fi)
+with socketserver.TCPServer(("0.0.0.0", PORT), Handler) as httpd:
     print(f"\n=======================================================")
-    print(f"  SERWER URUCHOMIONY!")
-    print(f"  Otwórz w przeglądarce: http://localhost:{PORT}")
+    print(f"  SERWER URUCHOMIONY W SIECI LOKALNEJ!")
+    print(f"  💻 Na komputerze: http://localhost:{PORT}")
+    print(f"  📱 Na telefonie (Wi-Fi): http://{local_ip}:{PORT}")
     print(f"=======================================================\n")
-    print("Wskazówka dla telefonu:")
-    print("Web Bluetooth wymaga bezpiecznego połączenia (HTTPS) na telefonach.")
-    print("Aby przetestować na telefonie:")
-    print("1. Wgraj ten folder na darmowy hosting HTTPS (np. GitHub Pages lub Vercel).")
-    print("2. Lub użyj funkcji debugowania USB w Chrome (Port Forwarding poru 8000).")
+    
+    print("⚠️ WAŻNA WSKAZÓWKA DLA TELEFONU (Web Bluetooth przez HTTP):")
+    print("Przeglądarki na telefonie wymagają połączenia HTTPS, aby zezwolić na używanie Bluetooth.")
+    print("Aby sterować klockiem za pomocą lokalnego serwera HTTP przez Wi-Fi:")
+    print("1. Otwórz w przeglądarce Chrome na telefonie adres: chrome://flags")
+    print("2. Wyszukaj flagę: unsafely-treat-insecure-origin-as-secure")
+    print("3. Włącz ją (Enabled) i w polu tekstowym wpisz adres serwera:")
+    print(f"   http://{local_ip}:{PORT}")
+    print("4. Kliknij przycisk 'Relaunch' na dole, aby zrestartować Chrome.")
+    print("5. Gotowe! Teraz Bluetooth zadziała lokalnie na Twoim telefonie.")
     print("\nNaciśnij Ctrl+C, aby wyłączyć serwer.\n")
     
     # Otwórz przeglądarkę automatycznie na komputerze
