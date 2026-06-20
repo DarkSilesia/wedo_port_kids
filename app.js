@@ -32,7 +32,25 @@ const LED_COLORS = {
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let noiseBuffer = null;
 
-// Pomocniczy bufor szumu do uzyskania naturalnych dźwięków (np. szczekanie psa)
+// Mapowanie nazw klocków na pliki MP3 dodane przez użytkownika
+const SOUND_FILES = {
+    cat: 'stu9-cute-cat-352656.mp3',
+    dog: 'dragon-studio-free-dog-bark-419014.mp3',
+    bird: 'dragon-studio-crow-calls-raspy-echoing-472377.mp3',
+    robot: 'freesound_community-little-robot-sound-84657.mp3',
+    alarm: 'dragon-studio-police-siren-397963.mp3'
+};
+
+// Pamięć podręczna na zdekodowane pliki audio
+const soundBuffers = {
+    cat: null,
+    dog: null,
+    bird: null,
+    robot: null,
+    alarm: null
+};
+
+// Pomocniczy bufor szumu dla syntetycznego generatora (fallback)
 function getNoiseBuffer() {
     if (!noiseBuffer) {
         const bufferSize = audioCtx.sampleRate * 0.4; // 0.4 sekundy szumu
@@ -45,50 +63,112 @@ function getNoiseBuffer() {
     return noiseBuffer;
 }
 
-function playSynthesizedSound(type) {
+// Funkcja wczytywania i dekodowania pliku MP3
+async function loadSoundFile(type) {
+    if (soundBuffers[type]) return soundBuffers[type];
+    try {
+        const response = await fetch(SOUND_FILES[type]);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const arrayBuffer = await response.arrayBuffer();
+        
+        // Dekodowanie z uwzględnieniem starszych silników iOS Safari
+        const audioBuffer = await new Promise((resolve, reject) => {
+            audioCtx.decodeAudioData(arrayBuffer, resolve, reject);
+        });
+        soundBuffers[type] = audioBuffer;
+        return audioBuffer;
+    } catch (e) {
+        console.warn(`Błąd ładowania MP3 dla ${type} (używam syntezatora):`, e);
+        return null;
+    }
+}
+
+// Wstępne pobranie wszystkich plików audio w tle, aby zapobiec opóźnieniom u dzieci
+function preloadAllSounds() {
+    Object.keys(SOUND_FILES).forEach(type => {
+        loadSoundFile(type);
+    });
+}
+
+async function playSynthesizedSound(type) {
     if (audioCtx.state === 'suspended') {
         audioCtx.resume();
     }
     
     const now = audioCtx.currentTime;
     
+    // Spróbuj pobrać wczytany bufor MP3
+    let buffer = soundBuffers[type];
+    if (!buffer) {
+        buffer = await loadSoundFile(type);
+    }
+    
+    if (buffer) {
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        
+        const gainNode = audioCtx.createGain();
+        // Zmniejszamy głośność (0.4), aby chronić słuch dziecka i głośnik telefonu
+        gainNode.gain.setValueAtTime(0.4, now);
+        
+        source.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        // Zabezpieczenie przed zbyt długimi dźwiękami: puszczamy maksymalnie kilka sekund
+        let duration = buffer.duration;
+        if (type === 'alarm') {
+            duration = Math.min(duration, 3.5); // Ograniczamy głośną syrenę policyjną do 3.5s
+        } else if (type === 'robot') {
+            duration = Math.min(duration, 2.2); // Limit dźwięku robota do 2.2s
+        } else if (type === 'bird') {
+            duration = Math.min(duration, 2.0); // Limit krakania do 2.0s
+        } else if (type === 'dog') {
+            duration = Math.min(duration, 1.5); // Limit szczekania do 1.5s
+        }
+        
+        source.start(now);
+        source.stop(now + duration);
+    } else {
+        // Fallback: jeśli MP3 nie jest dostępne (np. offline bez keszu), odpalamy syntezator matematyczny
+        playFallbackSound(type, now);
+    }
+}
+
+// Syntezator matematyczny jako niezawodne koło ratunkowe
+function playFallbackSound(type, now) {
     switch (type) {
-        case 'cat': { // meow (synteza formantowa "m-e-o-w")
+        case 'cat': {
             const osc1 = audioCtx.createOscillator();
             const osc2 = audioCtx.createOscillator();
             const filter = audioCtx.createBiquadFilter();
             const gain = audioCtx.createGain();
             
             osc1.type = 'triangle';
-            osc2.type = 'sawtooth'; // bogate harmoniczne do filtrowania
+            osc2.type = 'sawtooth';
             
             const osc2Gain = audioCtx.createGain();
-            osc2Gain.gain.value = 0.15; // przyciszamy ostry sawtooth
+            osc2Gain.gain.value = 0.15;
             
             osc2.connect(osc2Gain);
             osc1.connect(filter);
             osc2Gain.connect(filter);
-            
             filter.connect(gain);
             gain.connect(audioCtx.destination);
             
-            // Zmiana tonu (wysokości dźwięku) meow
             osc1.frequency.setValueAtTime(320, now);
             osc1.frequency.exponentialRampToValueAtTime(480, now + 0.15);
             osc1.frequency.exponentialRampToValueAtTime(300, now + 0.55);
             
-            osc2.frequency.setValueAtTime(322, now); // lekkie rozstrojenie dla głębi
+            osc2.frequency.setValueAtTime(322, now);
             osc2.frequency.exponentialRampToValueAtTime(482, now + 0.15);
             osc2.frequency.exponentialRampToValueAtTime(302, now + 0.55);
 
-            // Filtr Bandpass symulujący gardło kota i samogłoski (vowel formant sweep)
             filter.type = 'bandpass';
             filter.Q.value = 3.0;
             filter.frequency.setValueAtTime(500, now);
-            filter.frequency.exponentialRampToValueAtTime(1200, now + 0.18); // dźwięk "ee"
-            filter.frequency.exponentialRampToValueAtTime(450, now + 0.55); // przejście w "ow"
+            filter.frequency.exponentialRampToValueAtTime(1200, now + 0.18);
+            filter.frequency.exponentialRampToValueAtTime(450, now + 0.55);
             
-            // Obwiednia głośności
             gain.gain.setValueAtTime(0, now);
             gain.gain.linearRampToValueAtTime(0.25, now + 0.08);
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
@@ -99,7 +179,7 @@ function playSynthesizedSound(type) {
             osc2.stop(now + 0.6);
             break;
         }
-        case 'dog': { // bark/woof (szum + niski ton + szybki spadek)
+        case 'dog': {
             const osc = audioCtx.createOscillator();
             const oscGain = audioCtx.createGain();
             const noise = audioCtx.createBufferSource();
@@ -108,32 +188,26 @@ function playSynthesizedSound(type) {
             const masterGain = audioCtx.createGain();
             
             noise.buffer = getNoiseBuffer();
-            
             osc.type = 'sawtooth';
             
             noise.connect(noiseGain);
             noiseGain.connect(filter);
-            
             osc.connect(oscGain);
             oscGain.connect(filter);
-            
             filter.connect(masterGain);
             masterGain.connect(audioCtx.destination);
             
-            // Filtracja nadająca szczeknięciu „pudełkowy” charakter
             filter.type = 'bandpass';
             filter.frequency.setValueAtTime(380, now);
             filter.frequency.exponentialRampToValueAtTime(180, now + 0.14);
             filter.Q.value = 2.5;
             
-            // Obniżanie częstotliwości w trakcie szczeknięcia
             osc.frequency.setValueAtTime(150, now);
             osc.frequency.exponentialRampToValueAtTime(70, now + 0.14);
             
             oscGain.gain.setValueAtTime(0.25, now);
-            noiseGain.gain.setValueAtTime(0.55, now); // głośny szum nadaje realizmu
+            noiseGain.gain.setValueAtTime(0.55, now);
             
-            // Bardzo szybki atak i spadek głośności
             masterGain.gain.setValueAtTime(0, now);
             masterGain.gain.linearRampToValueAtTime(0.35, now + 0.01);
             masterGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
@@ -144,7 +218,7 @@ function playSynthesizedSound(type) {
             osc.stop(now + 0.16);
             break;
         }
-        case 'bird': { // chirp (szybki podwójny ćwierk - "ćwir ćwir")
+        case 'bird': {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             
@@ -152,7 +226,6 @@ function playSynthesizedSound(type) {
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             
-            // Pierwszy ćwierk (szybki skok w górę i dół)
             osc.frequency.setValueAtTime(1800, now);
             osc.frequency.exponentialRampToValueAtTime(3200, now + 0.04);
             osc.frequency.exponentialRampToValueAtTime(1400, now + 0.08);
@@ -161,7 +234,6 @@ function playSynthesizedSound(type) {
             gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
             
-            // Drugi ćwierk (nieco wyższy, startuje po 110ms)
             osc.frequency.setValueAtTime(2000, now + 0.11);
             osc.frequency.exponentialRampToValueAtTime(3600, now + 0.15);
             osc.frequency.exponentialRampToValueAtTime(1600, now + 0.19);
@@ -174,7 +246,7 @@ function playSynthesizedSound(type) {
             osc.stop(now + 0.21);
             break;
         }
-        case 'robot': { // bleep bloop
+        case 'robot': {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
@@ -195,7 +267,7 @@ function playSynthesizedSound(type) {
             osc.stop(now + 0.3);
             break;
         }
-        case 'alarm': { // siren
+        case 'alarm': {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
@@ -203,7 +275,6 @@ function playSynthesizedSound(type) {
             
             osc.type = 'sine';
             
-            // LFO do syreny
             osc.frequency.setValueAtTime(600, now);
             osc.frequency.linearRampToValueAtTime(900, now + 0.25);
             osc.frequency.linearRampToValueAtTime(600, now + 0.5);
@@ -872,6 +943,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Sprawdzenie kompatybilności przeglądarki na telefonie
     checkBrowserCompatibility();
+
+    // Wstępne wczytanie wszystkich plików MP3 w tle
+    preloadAllSounds();
 });
 
 // Sprawdzenie kompatybilności przeglądarki na telefonie komórkowym
