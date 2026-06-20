@@ -343,6 +343,27 @@
                 <button id="btn-close-help" class="btn-modal-ok">👍</button>
             </div>
         </div>
+
+        <!-- Modal: Brak wsparcia Bluetooth -->
+        <div id="modal-no-bluetooth" class="modal-overlay hidden">
+            <div class="modal-card" style="max-width: 340px; width: 90%;">
+                <div class="modal-content" style="flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 10px;">
+                    <span style="font-size: 40px;">⚠️</span>
+                    <h3 style="color: #ffffff; font-size: 16px; margin-bottom: 4px;">Brak obsługi Bluetooth</h3>
+                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.4;">
+                        Ta przeglądarka (np. Edge, Firefox) nie obsługuje połączeń Bluetooth na tym urządzeniu.
+                    </p>
+                    <p style="font-size: 13px; color: #ffffff; font-weight: bold; line-height: 1.4; margin-top: 6px;">
+                        Co zrobić?
+                    </p>
+                    <ul style="text-align: left; font-size: 12px; color: var(--text-secondary); margin-left: 16px; display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                        <li>🤖 <b>Android:</b> Otwórz stronę w przeglądarce <b>Google Chrome</b>.</li>
+                        <li>🍏 <b>iPhone (iOS):</b> Pobierz z App Store darmową przeglądarkkę <b>Bluefy</b> i otwórz w niej tę stronę.</li>
+                    </ul>
+                </div>
+                <button id="btn-close-no-bluetooth" class="btn-modal-ok">👍</button>
+            </div>
+        </div>
     </div>
     <script src="app.js?v=3"></script>
 </body>

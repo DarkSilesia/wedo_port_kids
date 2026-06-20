@@ -148,6 +148,13 @@ async function connectToWeDo() {
     const btnBt = document.getElementById('btn-bluetooth');
     const statusText = document.getElementById('bt-status-text');
     
+    // Sprawdź kompatybilność przeglądarki z Web Bluetooth
+    if (!navigator.bluetooth) {
+        closeAllModals();
+        document.getElementById('modal-no-bluetooth').classList.remove('hidden');
+        return;
+    }
+    
     try {
         if (statusText) statusText.innerText = "Skanowanie...";
         btnBt.className = "btn-header bt-connecting";
@@ -501,6 +508,7 @@ function initModalListeners() {
     document.getElementById('btn-close-wait').addEventListener('click', closeAllModals);
     document.getElementById('btn-close-sound').addEventListener('click', closeAllModals);
     document.getElementById('btn-close-help').addEventListener('click', closeAllModals);
+    document.getElementById('btn-close-no-bluetooth').addEventListener('click', closeAllModals);
     
     // Modal Silnika - Kierunek
     document.querySelectorAll('.dir-btn').forEach(btn => {
@@ -782,4 +790,29 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     document.addEventListener('touchstart', initAudio);
     document.addEventListener('click', initAudio);
+    
+    // Sprawdzenie kompatybilności przeglądarki na telefonie
+    checkBrowserCompatibility();
 });
+
+// Sprawdzenie kompatybilności przeglądarki na telefonie komórkowym
+function checkBrowserCompatibility() {
+    const ua = navigator.userAgent;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    if (isMobile) {
+        const isIOS = /iPhone|iPad|iPod/i.test(ua);
+        const isAndroid = /Android/i.test(ua);
+        
+        // Chrome na Androidzie (wykluczając Edge, Firefox, Operę na Androidzie)
+        const isChrome = isAndroid && /Chrome/i.test(ua) && !/Edg/i.test(ua) && !/Firefox/i.test(ua) && !/OPR/i.test(ua);
+        // Bluefy na iOS lub inna przeglądarka z wstrzykniętym Web Bluetooth
+        const isBluefy = isIOS && (ua.includes('Bluefy') || !!navigator.bluetooth);
+        
+        if (!isChrome && !isBluefy) {
+            setTimeout(() => {
+                closeAllModals();
+                document.getElementById('modal-no-bluetooth').classList.remove('hidden');
+            }, 300);
+        }
+    }
+}
