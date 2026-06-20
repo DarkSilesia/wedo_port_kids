@@ -13,7 +13,9 @@ let state = {
     isRunning: false,
     currentStepIndex: -1,
     activeBlockIdToEdit: null,
-    loopCount: 0
+    loopCount: 0,
+    savedPrograms: [],
+    activeSavedProgramId: null
 };
 
 // --- Kolory LED (Mapowanie bajtów WeDo 2.0) ---
@@ -578,7 +580,9 @@ function deleteBlock(id) {
 
 function clearAllBlocks() {
     state.program = [];
+    state.activeSavedProgramId = null; // Resetujemy aktywny program, aby nie nadpisać zapisanego przy czyszczeniu
     renderTimeline();
+    renderSavedProgramsList();
 }
 
 // --- Obsługa Modali (Konfiguracja bloczków) ---
@@ -895,6 +899,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-play').addEventListener('click', startProgram);
     document.getElementById('btn-stop').addEventListener('click', stopProgram);
     document.getElementById('btn-clear').addEventListener('click', clearAllBlocks);
+    document.getElementById('btn-save-program').addEventListener('click', saveCurrentProgram);
+    document.getElementById('btn-save-new-program').addEventListener('click', saveProgramAsNew);
     
     // Obsługa dodawania klocków z palety
     document.querySelectorAll('.palette-item').forEach(item => {
@@ -929,6 +935,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Wyrenderuj początkowy stan osi czasu (tylko klocek Start)
     renderTimeline();
+
+    // Wczytaj zapisane programy z localStorage
+    loadSavedProgramsFromStorage();
     
     // Audio context initialization on first touch (Safari and mobile security requirement)
     const initAudio = () => {
@@ -968,4 +977,186 @@ function checkBrowserCompatibility() {
             }, 300);
         }
     }
+}
+
+// --- Zarządzanie Zapisywaniem Programów (LocalStorage) ---
+
+const PROGRAM_EMOJIS = ['🤖', '🚗', '🦕', '🚀', '🐱', '🐶', '🦄', '🛸', '🚨', '✈️', '⛵️', '🐒', '🦁', '🐻', '🐝', '🐙'];
+
+// Programy demonstracyjne dodawane automatycznie na start, jeśli pamięć jest pusta
+const DEFAULT_DEMO_PROGRAMS = [
+    {
+        id: "demo-1",
+        emoji: "🚗",
+        blocks: [
+            { id: "d1-1", type: "motor", dir: "right", speed: "rabbit", port: "both" },
+            { id: "d1-2", type: "wait", duration: 2 },
+            { id: "d1-3", type: "motor-stop", port: "both" },
+            { id: "d1-4", type: "sound", sound: "dog" }
+        ]
+    },
+    {
+        id: "demo-2",
+        emoji: "🦕",
+        blocks: [
+            { id: "d2-1", type: "motor", dir: "right", speed: "rabbit", port: "1" },
+            { id: "d2-2", type: "motor", dir: "left", speed: "rabbit", port: "2" },
+            { id: "d2-3", type: "led", color: "pink" },
+            { id: "d2-4", type: "sound", sound: "cat" },
+            { id: "d2-5", type: "wait", duration: 3 },
+            { id: "d2-6", type: "motor-stop", port: "both" }
+        ]
+    },
+    {
+        id: "demo-3",
+        emoji: "🚨",
+        blocks: [
+            { id: "d3-1", type: "led", color: "red" },
+            { id: "d3-2", type: "sound", sound: "alarm" },
+            { id: "d3-3", type: "led", color: "blue" },
+            { id: "d3-4", type: "sound", sound: "alarm" },
+            { id: "d3-5", type: "loop" }
+        ]
+    }
+];
+
+// Funkcja wczytywania programów z pamięci lokalnej
+function loadSavedProgramsFromStorage() {
+    try {
+        const stored = localStorage.getItem('wedo_saved_programs');
+        if (stored) {
+            state.savedPrograms = JSON.parse(stored);
+        } else {
+            // Jeśli baza jest pusta, wczytaj domyślne programy demo
+            state.savedPrograms = JSON.parse(JSON.stringify(DEFAULT_DEMO_PROGRAMS));
+            localStorage.setItem('wedo_saved_programs', JSON.stringify(state.savedPrograms));
+        }
+    } catch (e) {
+        console.error("Błąd odczytu programów z localStorage:", e);
+        state.savedPrograms = [];
+    }
+    renderSavedProgramsList();
+}
+
+// Zapisz aktualny stan programu na osi czasu
+function saveCurrentProgram() {
+    if (state.program.length === 0) return;
+    
+    // Jeśli mamy już aktywny załadowany program, nadpisujemy go
+    if (state.activeSavedProgramId) {
+        const prog = state.savedPrograms.find(p => p.id === state.activeSavedProgramId);
+        if (prog) {
+            prog.blocks = JSON.parse(JSON.stringify(state.program)); // głęboka kopia
+            localStorage.setItem('wedo_saved_programs', JSON.stringify(state.savedPrograms));
+            renderSavedProgramsList();
+            
+            // Efektowne mignięcie przycisku zapisu, potwierdzające sukces
+            const btn = document.getElementById('btn-save-program');
+            btn.style.borderColor = '#ffffff';
+            setTimeout(() => btn.style.borderColor = '', 300);
+            return;
+        }
+    }
+    
+    // W przeciwnym razie tworzymy nowy zapis. Wybieramy losową emotkę (która nie jest jeszcze użyta)
+    const usedEmojis = state.savedPrograms.map(p => p.emoji);
+    const availableEmojis = PROGRAM_EMOJIS.filter(e => !usedEmojis.includes(e));
+    const emoji = (availableEmojis.length > 0)
+        ? availableEmojis[Math.floor(Math.random() * availableEmojis.length)]
+        : PROGRAM_EMOJIS[Math.floor(Math.random() * PROGRAM_EMOJIS.length)];
+        
+    const newProg = {
+        id: Date.now().toString(),
+        emoji: emoji,
+        blocks: JSON.parse(JSON.stringify(state.program))
+    };
+    
+    state.savedPrograms.push(newProg);
+    state.activeSavedProgramId = newProg.id;
+    localStorage.setItem('wedo_saved_programs', JSON.stringify(state.savedPrograms));
+    renderSavedProgramsList();
+    
+    // Wizualne potwierdzenie zapisu
+    const btn = document.getElementById('btn-save-program');
+    btn.style.borderColor = '#ffffff';
+    setTimeout(() => btn.style.borderColor = '', 300);
+}
+
+// Zapisz aktualny stan programu jako nowy program (niezależnie od aktywnego id)
+function saveProgramAsNew() {
+    if (state.program.length === 0) return;
+    
+    // Wybieramy losową emotkę (która nie jest jeszcze użyta)
+    const usedEmojis = state.savedPrograms.map(p => p.emoji);
+    const availableEmojis = PROGRAM_EMOJIS.filter(e => !usedEmojis.includes(e));
+    const emoji = (availableEmojis.length > 0)
+        ? availableEmojis[Math.floor(Math.random() * availableEmojis.length)]
+        : PROGRAM_EMOJIS[Math.floor(Math.random() * PROGRAM_EMOJIS.length)];
+        
+    const newProg = {
+        id: Date.now().toString(),
+        emoji: emoji,
+        blocks: JSON.parse(JSON.stringify(state.program))
+    };
+    
+    state.savedPrograms.push(newProg);
+    state.activeSavedProgramId = newProg.id;
+    localStorage.setItem('wedo_saved_programs', JSON.stringify(state.savedPrograms));
+    renderSavedProgramsList();
+    
+    // Wizualne potwierdzenie zapisu
+    const btn = document.getElementById('btn-save-new-program');
+    if (btn) {
+        btn.style.borderColor = '#ffffff';
+        setTimeout(() => btn.style.borderColor = '', 300);
+    }
+}
+
+// Wczytaj wybrany program na oś czasu
+function loadSavedProgram(id) {
+    const prog = state.savedPrograms.find(p => p.id === id);
+    if (prog) {
+        state.program = JSON.parse(JSON.stringify(prog.blocks));
+        state.activeSavedProgramId = id;
+        renderTimeline();
+        renderSavedProgramsList();
+    }
+}
+
+// Usuń program z listy
+function deleteSavedProgram(id, event) {
+    if (event) event.stopPropagation(); // zapobiega wywołaniu ładowania programu
+    state.savedPrograms = state.savedPrograms.filter(p => p.id !== id);
+    if (state.activeSavedProgramId === id) {
+        state.activeSavedProgramId = null;
+    }
+    localStorage.setItem('wedo_saved_programs', JSON.stringify(state.savedPrograms));
+    renderSavedProgramsList();
+}
+
+// Renderuj listę kapsułek z emotkami u góry strony
+function renderSavedProgramsList() {
+    const listContainer = document.getElementById('saved-programs-list');
+    if (!listContainer) return;
+    
+    listContainer.innerHTML = '';
+    
+    state.savedPrograms.forEach(prog => {
+        const item = document.createElement('div');
+        item.className = `saved-program-item ${prog.id === state.activeSavedProgramId ? 'active' : ''}`;
+        item.addEventListener('click', () => loadSavedProgram(prog.id));
+        
+        const emojiSpan = document.createElement('span');
+        emojiSpan.className = 'saved-program-emoji';
+        emojiSpan.innerText = prog.emoji;
+        
+        const deleteBtn = document.createElement('div');
+        deleteBtn.className = 'saved-program-delete';
+        deleteBtn.innerText = '✕';
+        deleteBtn.addEventListener('click', (e) => deleteSavedProgram(prog.id, e));
+        
+        item.appendChild(emojiSpan);
+        item.appendChild(deleteBtn);
+        listContainer.appendChild(item);
+    });
 }

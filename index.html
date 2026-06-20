@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WeDo 2.0 Graficzny Kontroler</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=8">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d0e1c">
     <meta name="mobile-web-app-capable" content="yes">
@@ -40,6 +40,23 @@
                 </button>
             </div>
         </header>
+
+        <!-- Pasek zapisanych programów -->
+        <section class="saved-programs-bar">
+            <button id="btn-save-program" class="btn-save" title="Zapisz program">
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path d="M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M15,9H5V5H15V9Z" fill="#ffffff"/>
+                </svg>
+            </button>
+            <button id="btn-save-new-program" class="btn-save-new" title="Zapisz jako nowy program">
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="#ffffff"/>
+                </svg>
+            </button>
+            <div id="saved-programs-list" class="saved-list">
+                <!-- Kapsułki z emotkami zapisanych programów -->
+            </div>
+        </section>
 
         <!-- Sekcja główna: Oś czasu (Program) -->
         <main class="program-area">
@@ -308,13 +325,13 @@
             <div class="modal-card help-modal">
                 <div class="help-modal-header" style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
                     <h2>Instrukcja dla Rodzica 📚</h2>
-                    <span style="font-size: 11px; color: var(--text-secondary); opacity: 0.6; font-weight: bold; margin-bottom: 6px;">Wersja: v4</span>
+                    <span style="font-size: 11px; color: var(--text-secondary); opacity: 0.6; font-weight: bold; margin-bottom: 6px;">Wersja: v8</span>
                 </div>
                 <div class="help-modal-content">
                     <h3>💡 Jak połączyć klocki?</h3>
                     <p>Włącz Bluetooth w telefonie, włącz SmartHub WeDo (zielony przycisk) i kliknij ikonę <b>Bluetooth</b> w lewym górnym rogu. Sparuj SmartHub.</p>
                     <p><b>Wskazówka:</b> Jeśli łączysz się z telefonu, upewnij się, że w Chrome włączono flagę <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code> dla swojego IP.</p>
-
+ 
                     <h3>⚙️ Objaśnienie ikonek bloczków:</h3>
                     <ul>
                         <li>🟢 <b>Start:</b> Pierwszy klocek, od niego zaczyna się program.</li>
@@ -326,7 +343,7 @@
                         <li>🐱 / 🐶 / 🐦 / 🤖 / 🚨 <b>Dźwięki:</b> Odtwarza dźwięk z głośnika telefonu.</li>
                         <li>🔄 <b>Pętla:</b> Powtarza cały ułożony program w nieskończoność.</li>
                     </ul>
-
+ 
                     <h3>🤖 Sterowanie i Skręcanie (Ruch w prawo/lewo):</h3>
                     <p>Aby robot mógł skręcać, musisz podłączyć <b>dwa oddzielne silniki</b> do SmartHuba:</p>
                     <ul>
@@ -340,6 +357,14 @@
                         <li><b>Obie kropki</b> (domyślnie), aby oba silniki jechały prosto.</li>
                     </ul>
                     <p><b>Prędkości (zwierzątka):</b> 🐢 wolno, 🐇 średnio, 🐆 szybko.</p>
+                    
+                    <h3>💾 Zapisywanie programów:</h3>
+                    <p>Możesz zapisać ułożony program w pamięci telefonu:</p>
+                    <ul>
+                        <li>📥 <b>Przycisk z dyskietką (zielony):</b> Zapisuje zmiany w aktualnie wybranym programie (nadpisuje go).</li>
+                        <li>➕ <b>Przycisk z plusem (niebieski):</b> Zapisuje program jako zupełnie nowy (tworzy nową ikonkę u góry).</li>
+                        <li>❌ <b>Przycisk X na ikonce:</b> Usuwa dany program z pamięci.</li>
+                    </ul>
                 </div>
                 <button id="btn-close-help" class="btn-modal-ok">👍</button>
             </div>
@@ -366,6 +391,6 @@
             </div>
         </div>
     </div>
-    <script src="app.js?v=4"></script>
+    <script src="app.js?v=8"></script>
 </body>
 </html>
