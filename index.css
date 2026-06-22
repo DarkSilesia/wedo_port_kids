@@ -1,0 +1,648 @@
+/* ==========================================================================
+   LEGO WeDo 2.0 Motor Lab - Child-Friendly (5yo Safe) Stylesheet
+   ========================================================================== */
+
+:root {
+  /* Color System */
+  --bg-primary: #1e1e2f;
+  --bg-card: rgba(30, 41, 59, 0.75);
+  --border-color: rgba(255, 255, 255, 0.08);
+  
+  --color-lego-yellow: #fbbf24;
+  --color-lego-orange: #f97316;
+  --color-lego-red: #ef4444;
+  --color-lego-blue: #3b82f6;
+  --color-lego-green: #10b981;
+  --color-lego-pink: #ec4899;
+  --color-lego-purple: #8b5cf6;
+  
+  /* Text Accents */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-dark: #0f172a;
+
+  /* Fonts */
+  --font-body: 'Quicksand', sans-serif;
+  
+  /* Layout Transitions */
+  --transition-fast: 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation; /* Disable double tap to zoom, allow swipe */
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(at 10% 20%, rgba(59, 130, 246, 0.2) 0px, transparent 50%),
+    radial-gradient(at 90% 80%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
+    radial-gradient(at 50% 10%, rgba(251, 191, 36, 0.12) 0px, transparent 50%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 12px;
+  overflow-x: hidden;
+}
+
+/* App Container */
+.toy-app-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Playful Header */
+.toy-header {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 28px;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.toy-logo-group {
+  display: flex;
+  align-items: center;
+}
+
+.toy-logo-emoji {
+  font-size: 40px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+
+.toy-hud {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Battery Indicator */
+.toy-battery {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 6px 12px;
+  border-radius: 50px;
+}
+
+.battery-svg {
+  width: 28px;
+  height: 14px;
+  color: var(--text-primary);
+}
+
+/* Giant Connection Buttons */
+.btn {
+  font-size: 28px;
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active {
+  transform: scale(0.9) translateY(4px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-connect {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  border-bottom: 5px solid #047857;
+}
+
+.btn-disconnect {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+  border-bottom: 5px solid #b91c1c;
+}
+
+/* Main Dashboard Grid */
+.toy-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 800px) {
+  .toy-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card Styling */
+.toy-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 32px;
+  padding: 20px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+/* Columns container */
+.toy-left-col, .toy-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Interactive Wheel Visualization */
+.toy-simulation-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.lego-wheel-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.lego-wheel-svg {
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.5));
+  
+  /* Running rotation speed variable set from JS */
+  animation: spin-wheel linear infinite;
+  animation-play-state: paused;
+  animation-duration: var(--wheel-duration, 0s);
+}
+
+/* Animation directions */
+.lego-wheel-svg.cw {
+  animation-name: spin-wheel-cw;
+  animation-play-state: running;
+}
+
+.lego-wheel-svg.ccw {
+  animation-name: spin-wheel-ccw;
+  animation-play-state: running;
+}
+
+@keyframes spin-wheel-cw {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-wheel-ccw {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.speed-bubble {
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-lego-yellow);
+  color: var(--text-dark);
+  font-size: 32px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 15px rgba(251, 191, 36, 0.5);
+  border: 3px solid #fff;
+  z-index: 10;
+  transition: var(--transition-fast);
+}
+
+.speed-bubble.active-spin {
+  background: var(--color-lego-green);
+  box-shadow: 0 6px 15px rgba(16, 185, 129, 0.5);
+}
+
+.speed-bubble.active-back {
+  background: var(--color-lego-blue);
+  box-shadow: 0 6px 15px rgba(59, 130, 246, 0.5);
+}
+
+/* Setup Rows & Speed Presets */
+.toy-setup-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.toy-setup-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.toy-speed-presets {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 24px;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 8px;
+  width: 100%;
+}
+
+.btn-speed {
+  flex: 1;
+  font-size: 32px;
+  padding: 12px 0;
+  border: none;
+  background: transparent;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-speed.active {
+  background: var(--color-lego-orange);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-speed:active {
+  transform: scale(0.95);
+}
+
+/* Manual Hold to Run Buttons */
+.manual-button-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+.btn-hold-run {
+  border: none;
+  border-radius: 32px;
+  padding: 30px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s ease;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  touch-action: none; /* Stops swipe-to-scroll when dragging */
+}
+
+.btn-hold-run.left-spin {
+  background: linear-gradient(135deg, var(--color-lego-blue), #1e40af);
+  border-bottom: 8px solid #1d4ed8;
+}
+
+.btn-hold-run.right-spin {
+  background: linear-gradient(135deg, var(--color-lego-pink), #9d174d);
+  border-bottom: 8px solid #be185d;
+}
+
+.btn-hold-run:active, .btn-hold-run.holding {
+  transform: translateY(6px);
+  border-bottom-width: 2px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-hold-icon {
+  font-size: 52px;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.4));
+}
+
+.btn-toy-brake {
+  background: linear-gradient(135deg, var(--color-lego-red), #991b1b);
+  border: none;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  font-size: 34px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  border-bottom: 4px solid #7f1d1d;
+  transition: var(--transition-fast);
+}
+
+.btn-toy-brake:active {
+  transform: scale(0.9) translateY(4px);
+  border-bottom-width: 1px;
+}
+
+/* Action Sequencer */
+.blocks-library {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+/* LEGO Block Styling */
+.toy-block {
+  border: none;
+  border-radius: 18px;
+  padding: 15px 5px;
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.toy-block::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+
+.toy-block:hover {
+  transform: scale(1.05);
+}
+
+.toy-block:active {
+  transform: scale(0.9);
+}
+
+/* Block Colors */
+.block-left {
+  background: #3b82f6;
+}
+
+.block-right {
+  background: #ec4899;
+}
+
+.block-stop {
+  background: #ef4444;
+}
+
+.block-sound {
+  background: #8b5cf6;
+}
+
+.block-led {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.block-led-red { background: #b91c1c; }
+.block-led-green { background: #059669; }
+.block-led-blue { background: #1d4ed8; }
+.block-led-rainbow {
+  background: linear-gradient(135deg, #ef4444, #eab308, #3b82f6, #8b5cf6);
+}
+
+/* Timeline Workspace */
+.sequence-timeline {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 24px;
+  min-height: 140px;
+  padding: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 12px;
+  border: 3px dashed rgba(255, 255, 255, 0.1);
+  overflow-y: auto;
+  max-height: 280px;
+  width: 100%;
+}
+
+.timeline-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--text-secondary);
+}
+
+.empty-icon-bubble {
+  font-size: 48px;
+  animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Workspace Blocks */
+.workspace-block {
+  animation: pop-in var(--transition-fast) forwards;
+  position: relative;
+  padding-right: 32px !important;
+  font-size: 22px !important;
+  width: auto !important;
+  min-width: 80px;
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.workspace-block .delete-badge {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  background: #f43f5e;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #fff;
+  font-weight: 900;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.workspace-block.active-run {
+  box-shadow: 0 0 20px #fff;
+  transform: scale(1.1);
+  border: 3px solid #fff;
+}
+
+/* Sequence Controls */
+.sequence-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.btn-play {
+  font-size: 32px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--color-lego-green), #047857);
+  color: #fff;
+  box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
+  border-bottom: 5px solid #047857;
+  transition: var(--transition-fast);
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-play:active {
+  transform: translateY(3px);
+  border-bottom-width: 1px;
+}
+
+.btn-stop {
+  font-size: 32px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--color-lego-red), #991b1b);
+  color: #fff;
+  box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4);
+  border-bottom: 5px solid #991b1b;
+  transition: var(--transition-fast);
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-clear {
+  font-size: 32px;
+  padding: 12px;
+  width: 65px;
+  height: 65px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-clear:active {
+  transform: scale(0.9);
+}
+
+/* Loop Toggle Switch */
+.loop-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.toy-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.toy-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toy-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: .2s;
+  border-radius: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.toy-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: .2s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toy-switch input:checked + .toy-switch-slider {
+  background-color: var(--color-lego-orange);
+}
+
+.toy-switch input:checked + .toy-switch-slider:before {
+  transform: translateX(22px);
+}
+
+.loop-label {
+  font-size: 26px;
+}
+
+/* Footer info */
+.toy-footer {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.copyright-info {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.25);
+}

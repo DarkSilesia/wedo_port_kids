@@ -1,397 +1,219 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WeDo 2.0 Graficzny Kontroler</title>
-    <link rel="stylesheet" href="style.css?v=9">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0d0e1c">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LEGO WeDo 2.0 Motor Lab 🏎️🤖</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@800;900&family=Quicksand:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Panel górny: Status połączenia, bateria i pomoc (Zminimalizowany dla telefonów) -->
-        <header class="app-header">
-            <button id="btn-bluetooth" class="btn-header bt-disconnected">
-                <svg class="icon-bt" viewBox="0 0 24 24" width="20" height="20">
-                    <path d="M17.71,7.71L12,2h-1v7.59L6.41,4.59L5,6l6,6l-6,6l1.41,1.41L11,14.41V22h1l5.71-5.71L13.41,12L17.71,7.71z M13,5.83 l1.88,1.88L13,9.59V5.83z M13,18.17v-3.76l1.88,1.88L13,18.17z"/>
-                </svg>
-            </button>
-            
-            <div class="header-right">
-                <div id="battery-indicator" class="battery-status hidden">
-                    <svg viewBox="0 0 24 24" width="16" height="16">
-                        <path d="M16 20H8V6H16V20ZM15.5 4H13V2H11V4H8.5C7.67 4 7 4.67 7 5.5V20.5C7 21.33 7.67 22 8.5 22H15.5C16.33 22 17 21.33 17 20.5V5.5C17 4.67 16.33 4 15.5 4Z" fill="#22c55e"/>
-                    </svg>
-                    <span id="battery-level">100%</span>
-                </div>
-                
-                <button id="btn-help" class="btn-header bt-disconnected" style="border-radius: 50%;">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#8e95be" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-                        <line x1="12" y1="17" x2="12.01" y2="17"/>
-                    </svg>
-                </button>
-            </div>
-        </header>
+  <div class="toy-app-container">
+    <!-- Playful Header -->
+    <header class="toy-header">
+      <div class="toy-logo-group">
+        <span class="toy-logo-emoji">🏎️🤖</span>
+      </div>
 
-        <!-- Pasek zapisanych programów -->
-        <section class="saved-programs-bar">
-            <button id="btn-save-program" class="btn-save" title="Zapisz program">
-                <svg viewBox="0 0 24 24" width="16" height="16">
-                    <path d="M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M15,9H5V5H15V9Z" fill="#ffffff"/>
-                </svg>
-            </button>
-            <button id="btn-save-new-program" class="btn-save-new" title="Zapisz jako nowy program">
-                <svg viewBox="0 0 24 24" width="16" height="16">
-                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="#ffffff"/>
-                </svg>
-            </button>
-            <div id="saved-programs-list" class="saved-list">
-                <!-- Kapsułki z emotkami zapisanych programów -->
+      <div class="toy-hud">
+        <!-- Battery Status -->
+        <div class="toy-battery" id="batteryContainer" style="display: none;">
+          <svg class="battery-svg" viewBox="0 0 24 12">
+            <rect x="1" y="1" width="18" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+            <rect x="20" y="3" width="2" height="6" fill="currentColor"/>
+            <rect id="batteryLevelBar" x="3" y="3" width="14" height="6" rx="1" fill="#10b981"/>
+          </svg>
+          <span id="batteryPercentage">--%</span>
+        </div>
+
+        <!-- Connection Buttons -->
+        <button id="btnConnect" class="btn btn-connect">
+          🔌
+        </button>
+        <button id="btnDisconnect" class="btn btn-disconnect" style="display: none;">
+          ❌
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Toy Dashboard -->
+    <main class="toy-main-grid">
+      
+      <!-- LEFT COLUMN: Simulator & Manual Controls -->
+      <div class="toy-left-col">
+        
+        <!-- Interactive Motor Simulation Widget -->
+        <section class="toy-card sim-widget-card">
+          <div class="toy-simulation-area">
+            <!-- Simulated LEGO Wheel -->
+            <div class="lego-wheel-container">
+              <svg class="lego-wheel-svg" id="legoWheelSvg" viewBox="0 0 200 200">
+                <defs>
+                  <radialGradient id="tireGrad" cx="50%" cy="50%" r="50%">
+                    <stop offset="70%" stop-color="#2d2f33"/>
+                    <stop offset="90%" stop-color="#1b1c1e"/>
+                    <stop offset="100%" stop-color="#090a0a"/>
+                  </radialGradient>
+                  <linearGradient id="hubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#fcd34d"/>
+                    <stop offset="50%" stop-color="#f59e0b"/>
+                    <stop offset="100%" stop-color="#d97706"/>
+                  </linearGradient>
+                </defs>
+                <!-- Tire Outer -->
+                <circle cx="100" cy="100" r="90" fill="url(#tireGrad)" stroke="#111" stroke-width="4"/>
+                <circle cx="100" cy="100" r="70" fill="none" stroke="#222" stroke-dasharray="8,6" stroke-width="4"/>
+                <!-- Yellow Hub -->
+                <circle cx="100" cy="100" r="50" fill="url(#hubGrad)"/>
+                <!-- LEGO Hub Details -->
+                <circle cx="100" cy="100" r="38" fill="none" stroke="#b45309" stroke-width="2"/>
+                <circle cx="100" cy="100" r="16" fill="#1e293b" stroke="#0f172a" stroke-width="3" id="legoWheelCenter"/>
+                <!-- Peg holes / spokes -->
+                <g stroke="#78350f" stroke-width="2" fill="none">
+                  <line x1="100" y1="50" x2="100" y2="150" />
+                  <line x1="50" y1="100" x2="150" y2="100" />
+                  <circle cx="100" cy="65" r="5" fill="#f59e0b"/>
+                  <circle cx="100" cy="135" r="5" fill="#f59e0b"/>
+                  <circle cx="65" cy="100" r="5" fill="#f59e0b"/>
+                  <circle cx="135" cy="100" r="5" fill="#f59e0b"/>
+                </g>
+                <!-- Center Shaft cross -->
+                <rect x="96" y="90" width="8" height="20" rx="1.5" fill="#e2e8f0"/>
+                <rect x="90" y="96" width="20" height="8" rx="1.5" fill="#e2e8f0"/>
+                <circle cx="100" cy="100" r="3" fill="#cbd5e1"/>
+              </svg>
+              <!-- Speedometer Popover bubble -->
+              <div class="speed-bubble" id="speedDisplayBubble">
+                🛑
+              </div>
             </div>
+          </div>
         </section>
 
-        <!-- Sekcja główna: Oś czasu (Program) -->
-        <main class="program-area">
-            <div class="timeline-container">
-                <div id="program-timeline" class="timeline">
-                    <!-- Klocki programu będą tu dodawane dynamicznie -->
-                    <div class="timeline-block start-block" id="start-anchor">
-                        <div class="block-icon">
-                            <svg viewBox="0 0 24 24" width="30" height="30">
-                                <path d="M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z" fill="#22c55e"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+        <!-- Speed Presets Card -->
+        <section class="toy-card setup-card">
+          <div class="toy-setup-row">
+            <!-- Manual Run Speed Selector -->
+            <div class="toy-setup-group">
+              <div class="toy-speed-presets">
+                <button class="btn-speed" data-speed="42">🐌</button>
+                <button class="btn-speed active" data-speed="61">🐕</button>
+                <button class="btn-speed" data-speed="100">⚡</button>
+              </div>
             </div>
-        </main>
+          </div>
+        </section>
 
-        <!-- Dolny panel: Zintegrowane sterowanie i paleta bloczków (Zoptymalizowane pod Landscape) -->
-        <footer class="control-panel">
-            <!-- Przyciski wykonania z lewej strony -->
-            <div class="actions-row">
-                <button id="btn-clear" class="btn-action btn-clear-danger">
-                    <svg viewBox="0 0 24 24" width="22" height="22">
-                        <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" fill="#ef4444"/>
-                    </svg>
-                </button>
-                <button id="btn-play" class="btn-action btn-play-success">
-                    <svg viewBox="0 0 24 24" width="32" height="32">
-                        <path d="M8,5.14V19.14L19,12.14L8,5.14Z" fill="#ffffff"/>
-                    </svg>
-                </button>
-                <button id="btn-stop" class="btn-action btn-stop-danger hidden">
-                    <svg viewBox="0 0 24 24" width="24" height="24">
-                        <path d="M6,6H18V18H6V6Z" fill="#ffffff"/>
-                    </svg>
-                </button>
-            </div>
+        <!-- Manual Control (Hold-to-run) Card -->
+        <section class="toy-card manual-card">
+          <div class="manual-button-grid">
+            <!-- Press and Hold Left -->
+            <button class="btn-hold-run left-spin" id="btnHoldLeft" touch-action="none">
+              <div class="btn-hold-icon">◀️🔄</div>
+            </button>
 
-            <!-- Paleta bloczków z prawej strony (skrolowana w poziomie) -->
-            <div class="palette-scroll-container">
-                <div class="block-palette">
-                    <!-- Silnik w prawo (Zielona strzałka) -->
-                    <button class="palette-item" data-type="motor" data-dir="right" data-speed="rabbit">
-                        <div class="palette-icon-bg motor-right-bg">
-                            <svg viewBox="0 0 24 24" width="26" height="26">
-                                <path d="M5,12 L19,12 M13,6 L19,12 L13,18" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                            </svg>
-                        </div>
-                    </button>
+            <!-- Press and Hold Right -->
+            <button class="btn-hold-run right-spin" id="btnHoldRight" touch-action="none">
+              <div class="btn-hold-icon">🔄▶️</div>
+            </button>
+          </div>
+          <div style="display: flex; justify-content: center; margin-top: 10px;">
+            <button class="btn-toy-brake" id="btnBrakeStop">🛑</button>
+          </div>
+        </section>
 
-                    <!-- Silnik w lewo (Pomarańczowa strzałka) -->
-                    <button class="palette-item" data-type="motor" data-dir="left" data-speed="rabbit">
-                        <div class="palette-icon-bg motor-left-bg">
-                            <svg viewBox="0 0 24 24" width="26" height="26">
-                                <path d="M19,12 L5,12 M11,6 L5,12 L11,18" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                            </svg>
-                        </div>
-                    </button>
+      </div>
 
-                    <!-- Zatrzymaj silnik (Czerwony stop) -->
-                    <button class="palette-item" data-type="motor-stop">
-                        <div class="palette-icon-bg stop-bg">
-                            <svg viewBox="0 0 24 24" width="26" height="26">
-                                <polygon points="8,2 16,2 22,8 22,16 16,22 8,22 2,16 2,8" fill="#ffffff"/>
-                            </svg>
-                        </div>
-                    </button>
-
-                    <!-- Diody LED (Światełko) -->
-                    <button class="palette-item" data-type="led" data-color="blue">
-                        <div class="palette-icon-bg led-bg">
-                            <svg viewBox="0 0 24 24" width="26" height="26">
-                                <path d="M12,2A7,7 0 0,0 5,9C5,12.63 7.39,15.7 10.76,16.5V19H13.24V16.5C16.61,15.7 19,12.63 19,9A7,7 0 0,0 12,2" fill="#ffffff"/>
-                            </svg>
-                        </div>
-                    </button>
-
-                    <!-- Zegar (Czekaj) -->
-                    <button class="palette-item" data-type="wait" data-duration="1">
-                        <div class="palette-icon-bg wait-bg">
-                            <svg viewBox="0 0 24 24" width="26" height="26">
-                                <path d="M6 2H18V8H18V8L14 12L18 16V16H18V22H6V16H6V16L10 12L6 8V8H6V2M8 4V7.5L12 11.5L16 7.5V4H8" fill="#ffffff"/>
-                            </svg>
-                        </div>
-                    </button>
-
-                    <!-- Głośnik (Dźwięk) -->
-                    <button class="palette-item" data-type="sound" data-sound="cat">
-                        <div class="palette-icon-bg sound-bg">
-                            <svg viewBox="0 0 24 24" width="26" height="26">
-                                <path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18,19.86 21,16.28 21,12 M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16 M3,9V15H7L12,20V4L7,9H3Z" fill="#ffffff"/>
-                            </svg>
-                        </div>
-                    </button>
-                    
-                    <!-- Pętla (Powtarzanie) -->
-                    <button class="palette-item" data-type="loop">
-                        <div class="palette-icon-bg loop-bg">
-                            <svg viewBox="0 0 24 24" width="26" height="26">
-                                <path d="M19,8l-4,4h3c0,3.31-2.69,6-6,6c-1.01,0-1.97-0.25-2.8-0.7l-1.46,1.46C8.97,19.54,10.43,20,12,20c4.42,0,8-3.58,8-8h3L19,8z M6,12 c0-3.31,2.69-6,6-6c1.01,0,1.97,0.25,2.8,0.7l1.46-1.46C15.03,4.46,13.57,4,12,4c-4.42,0-8,3.58-8,8H1L5,16l4-4H6z" fill="#ffffff"/>
-                            </svg>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </footer>
-
-        <!-- Okienka konfiguracyjne (Czysto graficzne, bez tekstu, dopasowane do wysokości landscape) -->
+      <!-- RIGHT COLUMN: Blocks Programmer & Sequence Timeline -->
+      <div class="toy-right-col">
         
-        <!-- Modal: Silnik (Kierunek, Port i Prędkość) -->
-        <div id="modal-motor" class="modal-overlay hidden">
-            <div class="modal-card wide-modal">
-                <div class="modal-content horizontal-layout">
-                    <!-- Kierunek (Strzałka w prawo lub w lewo) -->
-                    <div class="setting-group compact-group">
-                        <div class="direction-options">
-                            <button id="motor-opt-dir-right" class="dir-btn" data-dir="right">
-                                <svg viewBox="0 0 24 24" width="48" height="48">
-                                    <path d="M5,12 L19,12 M13,6 L19,12 L13,18" stroke="#22c55e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                                </svg>
-                            </button>
-                            <button id="motor-opt-dir-left" class="dir-btn" data-dir="left">
-                                <svg viewBox="0 0 24 24" width="48" height="48">
-                                    <path d="M19,12 L5,12 M11,6 L5,12 L11,18" stroke="#f97316" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="divider-y"></div>
+        <!-- Block Library (Toolbox) -->
+        <section class="toy-card library-card">
+          <div class="blocks-library">
+            <!-- Motor blocks -->
+            <button class="toy-block block-left" data-action="left" data-duration="1">
+              <span>◀️ 1️⃣</span>
+            </button>
+            <button class="toy-block block-left" data-action="left" data-duration="2">
+              <span>◀️ 2️⃣</span>
+            </button>
+            <button class="toy-block block-right" data-action="right" data-duration="1">
+              <span>▶️ 1️⃣</span>
+            </button>
+            <button class="toy-block block-right" data-action="right" data-duration="2">
+              <span>▶️ 2️⃣</span>
+            </button>
+            <!-- Stop block -->
+            <button class="toy-block block-stop" data-action="stop" data-duration="1">
+              <span>🛑 1️⃣</span>
+            </button>
+            
+            <!-- Sound blocks -->
+            <button class="toy-block block-sound" data-action="beep" data-tone="low">
+              <span>🔊 🎵</span>
+            </button>
+            <button class="toy-block block-sound" data-action="beep" data-tone="high">
+              <span>🔊 🎶</span>
+            </button>
 
-                    <!-- Port Silnika (Lewy, Oba, Prawy) -->
-                    <div class="setting-group compact-group">
-                        <div class="port-options">
-                            <button class="port-btn" data-port="1" title="Lewy">
-                                <svg viewBox="0 0 24 24" width="36" height="36">
-                                    <rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
-                                    <circle cx="9" cy="8" r="2.5" fill="#22c55e"/>
-                                    <circle cx="15" cy="8" r="2.5" fill="none" stroke="#ffffff" stroke-width="1.5"/>
-                                </svg>
-                            </button>
-                            <button class="port-btn" data-port="both" title="Oba">
-                                <svg viewBox="0 0 24 24" width="36" height="36">
-                                    <rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
-                                    <circle cx="9" cy="8" r="2.5" fill="#22c55e"/>
-                                    <circle cx="15" cy="8" r="2.5" fill="#22c55e"/>
-                                </svg>
-                            </button>
-                            <button class="port-btn" data-port="2" title="Prawy">
-                                <svg viewBox="0 0 24 24" width="36" height="36">
-                                    <rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
-                                    <circle cx="9" cy="8" r="2.5" fill="none" stroke="#ffffff" stroke-width="1.5"/>
-                                    <circle cx="15" cy="8" r="2.5" fill="#22c55e"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="divider-y"></div>
-                    
-                    <!-- Prędkość (Zwierzątka) -->
-                    <div class="setting-group compact-group">
-                        <div class="speed-options">
-                            <button class="speed-btn" data-speed="turtle">
-                                <span class="speed-emoji">🐢</span>
-                            </button>
-                            <button class="speed-btn" data-speed="rabbit">
-                                <span class="speed-emoji">🐇</span>
-                            </button>
-                            <button class="speed-btn" data-speed="cheetah">
-                                <span class="speed-emoji">🐆</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <button id="btn-close-motor" class="btn-modal-ok">👍</button>
-            </div>
-        </div>
+            <!-- LED blocks -->
+            <button class="toy-block block-led block-led-red" data-action="led" data-color="red" data-color-idx="9">
+              <span>🔴</span>
+            </button>
+            <button class="toy-block block-led block-led-green" data-action="led" data-color="green" data-color-idx="6">
+              <span>🟢</span>
+            </button>
+            <button class="toy-block block-led block-led-blue" data-action="led" data-color="blue" data-color-idx="3">
+              <span>🔵</span>
+            </button>
+            <button class="toy-block block-led block-led-rainbow" data-action="led" data-color="rainbow" data-color-idx="10">
+              <span>🌈</span>
+            </button>
+          </div>
+        </section>
 
-        <!-- Modal: Stop Silnika (Wybór portu) -->
-        <div id="modal-motor-stop" class="modal-overlay hidden">
-            <div class="modal-card">
-                <div class="modal-content">
-                    <div class="setting-group">
-                        <div class="port-options">
-                            <button class="stop-port-btn" data-port="1" title="Lewy">
-                                <svg viewBox="0 0 24 24" width="36" height="36">
-                                    <rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
-                                    <circle cx="9" cy="8" r="2.5" fill="#ef4444"/>
-                                    <circle cx="15" cy="8" r="2.5" fill="none" stroke="#ffffff" stroke-width="1.5"/>
-                                </svg>
-                            </button>
-                            <button class="stop-port-btn" data-port="both" title="Oba">
-                                <svg viewBox="0 0 24 24" width="36" height="36">
-                                    <rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
-                                    <circle cx="9" cy="8" r="2.5" fill="#ef4444"/>
-                                    <circle cx="15" cy="8" r="2.5" fill="#ef4444"/>
-                                </svg>
-                            </button>
-                            <button class="stop-port-btn" data-port="2" title="Prawy">
-                                <svg viewBox="0 0 24 24" width="36" height="36">
-                                    <rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
-                                    <circle cx="9" cy="8" r="2.5" fill="none" stroke="#ffffff" stroke-width="1.5"/>
-                                    <circle cx="15" cy="8" r="2.5" fill="#ef4444"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <button id="btn-close-motor-stop" class="btn-modal-ok">👍</button>
+        <!-- Sequence Workspace -->
+        <section class="toy-card sequence-card">
+          <!-- Timeline where blocks accumulate -->
+          <div class="sequence-timeline" id="sequenceTimeline">
+            <!-- Empty state illustration -->
+            <div class="timeline-empty-state" id="timelineEmptyState">
+              <div class="empty-icon-bubble">🧩</div>
             </div>
-        </div>
+          </div>
 
-        <!-- Modal: LED (Paleta kolorów) -->
-        <div id="modal-led" class="modal-overlay hidden">
-            <div class="modal-card">
-                <div class="modal-content">
-                    <div class="color-row">
-                        <button class="color-btn" data-color-val="pink" style="background-color: #ff007f;"></button>
-                        <button class="color-btn" data-color-val="purple" style="background-color: #8b5cf6;"></button>
-                        <button class="color-btn" data-color-val="blue" style="background-color: #3b82f6;"></button>
-                        <button class="color-btn" data-color-val="cyan" style="background-color: #06b6d4;"></button>
-                        <button class="color-btn" data-color-val="green" style="background-color: #10b981;"></button>
-                        <button class="color-btn" data-color-val="yellow" style="background-color: #fbbf24;"></button>
-                        <button class="color-btn" data-color-val="orange" style="background-color: #f97316;"></button>
-                        <button class="color-btn" data-color-val="red" style="background-color: #ef4444;"></button>
-                    </div>
-                </div>
-                <button id="btn-close-led" class="btn-modal-ok">👍</button>
+          <!-- Sequence Controls -->
+          <div class="sequence-actions">
+            <button id="btnPlaySeq" class="btn-play">
+              🏁
+            </button>
+            <button id="btnStopSeq" class="btn-stop" style="display: none;">
+              🛑
+            </button>
+            <button id="btnClearSeq" class="btn-clear">
+              🗑️
+            </button>
+            <div class="loop-checkbox-container">
+              <label class="toy-switch">
+                <input type="checkbox" id="chkLoopSeq">
+                <span class="toy-switch-slider"></span>
+              </label>
+              <span class="loop-label">🔁</span>
             </div>
-        </div>
+          </div>
+        </section>
 
-        <!-- Modal: Czekanie (Tylko cyfry) -->
-        <div id="modal-wait" class="modal-overlay hidden">
-            <div class="modal-card">
-                <div class="modal-content">
-                    <div class="duration-options">
-                        <button class="dur-btn" data-dur="1">1</button>
-                        <button class="dur-btn" data-dur="2">2</button>
-                        <button class="dur-btn" data-dur="3">3</button>
-                        <button class="dur-btn" data-dur="5">5</button>
-                    </div>
-                </div>
-                <button id="btn-close-wait" class="btn-modal-ok">👍</button>
-            </div>
-        </div>
+      </div>
+    </main>
 
-        <!-- Modal: Dźwięki (Same emotki zwierząt) -->
-        <div id="modal-sound" class="modal-overlay hidden">
-            <div class="modal-card">
-                <div class="modal-content">
-                    <div class="sound-row">
-                        <button class="sound-select-btn" data-sound-val="cat">🐱</button>
-                        <button class="sound-select-btn" data-sound-val="dog">🐶</button>
-                        <button class="sound-select-btn" data-sound-val="bird">🐦</button>
-                        <button class="sound-select-btn" data-sound-val="robot">🤖</button>
-                        <button class="sound-select-btn" data-sound-val="alarm">🚨</button>
-                    </div>
-                </div>
-                <button id="btn-close-sound" class="btn-modal-ok">👍</button>
-            </div>
-        </div>
+    <!-- Simple friendly copyright footer -->
+    <footer class="toy-footer">
+      <p class="copyright-info">LEGO® WeDo 2.0 Motor Playground &copy; 2026.</p>
+    </footer>
+  </div>
 
-        <!-- Modal: Instrukcja dla rodzica -->
-        <div id="modal-help" class="modal-overlay hidden">
-            <div class="modal-card help-modal">
-                <div class="help-modal-header" style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                    <h2>Instrukcja dla Rodzica 📚</h2>
-                    <span style="font-size: 11px; color: var(--text-secondary); opacity: 0.6; font-weight: bold; margin-bottom: 6px;">Wersja: v9</span>
-                </div>
-                <div class="help-modal-content">
-                    <h3>💡 Jak połączyć klocki?</h3>
-                    <p>Włącz Bluetooth w telefonie, włącz SmartHub WeDo (zielony przycisk) i kliknij ikonę <b>Bluetooth</b> w lewym górnym rogu. Sparuj SmartHub.</p>
-                    <p><b>Automatyczne łączenie:</b> Po pierwszym udanym sparowaniu, przy kolejnych połączeniach aplikacja spróbuje połączyć się z Twoim SmartHubem automatycznie w tle. Jeśli klocek będzie wyłączony, otworzy się standardowe okienko parowania.</p>
-                    <p><b>Wskazówka:</b> Jeśli łączysz się z telefonu, upewnij się, że w Chrome włączono flagę <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code> dla swojego IP.</p>
- 
-                    <h3>⚙️ Objaśnienie ikonek bloczków:</h3>
-                    <ul>
-                        <li>🟢 <b>Start:</b> Pierwszy klocek, od niego zaczyna się program.</li>
-                        <li>➡️ <b>Ruch w prawo:</b> Silnik obraca się w prawo (zgodnie ze wskazówkami zegara).</li>
-                        <li>⬅️ <b>Ruch w lewo:</b> Silnik obraca się w lewo.</li>
-                        <li>🛑 <b>Zatrzymaj:</b> Zatrzymuje obracanie silnika.</li>
-                        <li>💡 <b>Dioda LED:</b> Zmienia kolor światła na SmartHubie.</li>
-                        <li>⏳ <b>Czekaj:</b> Wstrzymuje program na określoną liczbę sekund.</li>
-                        <li>🐱 / 🐶 / 🐦 / 🤖 / 🚨 <b>Dźwięki:</b> Odtwarza dźwięk z głośnika telefonu.</li>
-                        <li>🔄 <b>Pętla:</b> Powtarza cały ułożony program w nieskończoność.</li>
-                    </ul>
- 
-                    <h3>🤖 Sterowanie i Skręcanie (Ruch w prawo/lewo):</h3>
-                    <p>Aby robot mógł skręcać, musisz podłączyć <b>dwa oddzielne silniki</b> do SmartHuba:</p>
-                    <ul>
-                        <li><b>Silnik Lewy</b> podłącz do <b>Portu 1</b>.</li>
-                        <li><b>Silnik Prawy</b> podłącz do <b>Portu 2</b>.</li>
-                    </ul>
-                    <p>Gdy klikniesz klocek silnika lub stopu na osi czasu, zobaczysz ikonę SmartHuba z dwiema kropkami. Kliknij:</p>
-                    <ul>
-                        <li><b>Lewą kropkę</b>, aby uruchomić/zatrzymać tylko <b>lewy silnik</b> (skręt).</li>
-                        <li><b>Prawą kropkę</b>, aby uruchomić/zatrzymać tylko <b>prawy silnik</b> (skręt).</li>
-                        <li><b>Obie kropki</b> (domyślnie), aby oba silniki jechały prosto.</li>
-                    </ul>
-                    <p><b>Prędkości (zwierzątka):</b> 🐢 wolno, 🐇 średnio, 🐆 szybko.</p>
-                    
-                    <h3>💾 Zapisywanie programów:</h3>
-                    <p>Możesz zapisać ułożony program w pamięci telefonu:</p>
-                    <ul>
-                        <li>📥 <b>Przycisk z dyskietką (zielony):</b> Zapisuje zmiany w aktualnie wybranym programie (nadpisuje go).</li>
-                        <li>➕ <b>Przycisk z plusem (niebieski):</b> Zapisuje program jako zupełnie nowy (tworzy nową ikonkę u góry).</li>
-                        <li>❌ <b>Przycisk X na ikonce:</b> Usuwa dany program z pamięci.</li>
-                    </ul>
-                </div>
-                <button id="btn-close-help" class="btn-modal-ok">👍</button>
-            </div>
-        </div>
-
-        <!-- Modal: Brak wsparcia Bluetooth -->
-        <div id="modal-no-bluetooth" class="modal-overlay hidden">
-            <div class="modal-card" style="max-width: 340px; width: 90%;">
-                <div class="modal-content" style="flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 10px;">
-                    <span style="font-size: 40px;">⚠️</span>
-                    <h3 style="color: #ffffff; font-size: 16px; margin-bottom: 4px;">Brak obsługi Bluetooth</h3>
-                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.4;">
-                        Ta przeglądarka (np. Edge, Firefox) nie obsługuje połączeń Bluetooth na tym urządzeniu.
-                    </p>
-                    <p style="font-size: 13px; color: #ffffff; font-weight: bold; line-height: 1.4; margin-top: 6px;">
-                        Co zrobić?
-                    </p>
-                    <ul style="text-align: left; font-size: 12px; color: var(--text-secondary); margin-left: 16px; display: flex; flex-direction: column; gap: 4px; width: 100%;">
-                        <li>🤖 <b>Android:</b> Otwórz stronę w przeglądarce <b>Google Chrome</b>.</li>
-                        <li>🍏 <b>iPhone (iOS):</b> Pobierz z App Store darmową przeglądarkkę <b>Bluefy</b> i otwórz w niej tę stronę.</li>
-                    </ul>
-                </div>
-                <button id="btn-close-no-bluetooth" class="btn-modal-ok">👍</button>
-            </div>
-        </div>
-    </div>
-    <script src="app.js?v=9"></script>
+  <script src="index.js"></script>
 </body>
 </html>
